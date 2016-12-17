@@ -6,17 +6,16 @@ import {
   CHANGE_PAGE, SUCCESS_FETCH_POSTS
 } from './actions';
 import Loading from './pages/loading';
+import router from '../../src/reducer';
 
 type Post = { id: string, title: string, body: string };
 
 type AppState = {};
 type PostsState = { list: Array<string>, entities: { [key: string]: Post } };
-type RouteState = { page: ?Function };
 
 export type State = {
   app: AppState,
   posts: PostsState,
-  route: RouteState,
 };
 
 const initial: State = {
@@ -26,9 +25,6 @@ const initial: State = {
     entities: {},
     status: 'ready',
     error: false,
-  },
-  route: {
-    page: Loading,
   },
 };
 
@@ -54,11 +50,6 @@ const handlers = {
       return { ...state, status: 'ready', error: true };
     },
   },
-  route: {
-    CHANGE_PAGE: (state, { payload: page }) => {
-      return { ...state, page };
-    }
-  },
 };
 
 function app(state: AppState = initial.app, action: Action): AppState {
@@ -73,12 +64,6 @@ function posts(state: PostsState = initial.posts, action: Action): PostsState {
   return handler(state, action);
 }
 
-function route(state: RouteState = initial.route, action: Action): RouteState {
-  const handler = handlers.route[action.type];
-  if (!handler) return state;
-  return handler(state, action);
-}
-
 export default combineReducers(
-  { app, posts, route }
+  { app, posts, router }
 );

@@ -2,9 +2,7 @@ import { eventChannel } from 'redux-saga';
 import { take, call, put } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import qs from 'querystring';
-
-export const CHANGE_PAGE = 'CHANGE_PAGE';
-export const changePage = payload => ({ type: CHANGE_PAGE, payload });
+import { initPage, changePage, updatePathInfo } from './actions';
 
 function prepareMatcher(routes) {
   const matcher = ruta3();
@@ -36,15 +34,23 @@ function createHandler(matcher) {
     const matched = matcher.match(location.pathname);
     if (matched) {
       const { action, params, route, splats } = matched;
-      yield call(action, { params, splats, route, query: parse(location.search) });
+      const info = {
+        path: location.pathname,
+        params,
+        query: parse(location.search),
+        splats,
+        route,
+      };
+      yield put(updatePathInfo(info));
+      yield call(action, info);
     } else {
-      console.error(`No route matched`);
+      console.error(`No route matched: ${location.pathname}`);
     }
   }
 }
 
 function createRouteAction(Page) {
-  const name = `action${Page.displayName || 'UnknownPage'}`;
+  const name = `generated${Page.displayName || 'Unknown'}Page`;
   const action = {
     [name]: function* () {
       yield put(changePage(Page));
@@ -71,7 +77,10 @@ function preprocess(routes) {
   return routes;
 }
 
-export default function* router(history, routes) {
+export default function* towerSaga(history, routes, initial) {
+  // Set initial component
+  yield put(initPage(initial));
+
   const channel = createLocationChannel(history);
   const handler = createHandler(prepareMatcher(preprocess(routes)));
 
@@ -80,7 +89,6 @@ export default function* router(history, routes) {
 
   while (true) {
     const { location } = yield take(channel);
-    console.log('changed', location);
     yield call(handler, location);
   }
 }

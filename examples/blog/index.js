@@ -4,7 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import Layout from './components/layout';
-import Router from './components/router';
+import Router from '../../src/react/router';
 import configureStore from './store';
 
 ReactDOM.render(

@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Menu, Icon, Header, Progress, Segment } from 'semantic-ui-react';
-import { Link } from '../sagas/router';
+import { Link } from '../sagas/routes';
 
 class Layout extends Component {
   render() {
     const { loading, children } = this.props;
     return <div>
       <Segment>
-        <Header as='h1' style={{ margin: '.5rem' }}>
-          <Menu secondary size='huge'>
+        <Header as='h1' style={{ margin: 0 }}>
+          <Menu secondary size='massive'>
             <Menu.Item header>
               <Icon name='write' />
               My First Blog

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Header, Container, Breadcrumb } from 'semantic-ui-react';
-import { Link } from '../../sagas/router';
+import { Link } from '../../sagas/routes';
 
 class PostsShow extends Component {
   render() {

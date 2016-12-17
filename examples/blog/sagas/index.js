@@ -1,5 +1,5 @@
 import { put, fork, take, call } from 'redux-saga/effects';
-import router from './router';
+import routes from './routes';
 import * as api from '../api';
 import { requestFetchPosts, successFetchPosts, failureFetchPosts } from '../actions';
 
@@ -32,5 +32,5 @@ export function* loadPost(id) {
 }
 
 export default function* rootSaga() {
-  yield fork(router);
+  yield fork(routes);
 }

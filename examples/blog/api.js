@@ -38,6 +38,7 @@ const POSTS = {
 
 function response(data) {
   return new Promise(resolve => {
+    // Simulate communication delay
     setTimeout(() => {
       resolve(data);
     }, 1500);

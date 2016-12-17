@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Grid, Menu, Header, Container, Breadcrumb, Divider } from 'semantic-ui-react';
-import { Link } from '../../sagas/router';
+import { Header, Container, Breadcrumb, Divider } from 'semantic-ui-react';
+import { Link } from '../../sagas/routes';
+import Pagination from '../../components/pagination';
 
 class PostsIndex extends Component {
   render() {
-    const { posts } = this.props;
+    const { posts, query } = this.props;
     return <Container>
       <Breadcrumb size='big'>
         <Breadcrumb.Section>Home</Breadcrumb.Section>
@@ -21,27 +22,16 @@ class PostsIndex extends Component {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Menu pagination>
-          <Menu.Item disabled>1</Menu.Item>
-          <Menu.Item>
-            <Link to='/posts?page=2'>2</Link>
-          </Menu.Item>
-          <Menu.Item>
-            <Link to='/posts?page=3'>3</Link>
-          </Menu.Item>
-          <Menu.Item>
-            <Link to='/posts?page=4'>4</Link>
-          </Menu.Item>
-        </Menu>
-      </div>
+      <Divider hidden />
+      <Pagination page={query.page} />
     </Container>;
   }
 }
 
-function select({ posts: { list, entities } }) {
+function select({ posts: { list, entities }, router }) {
   const posts = list.map(id => entities[id]);
-  return { posts };
+  const { query } = router;
+  return { posts, query };
 }
 
 export default connect(select)(PostsIndex);

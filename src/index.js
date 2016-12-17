@@ -1,5 +1,6 @@
 import createBrowserHistory from 'history/createBrowserHistory';
 import createHashHistory from 'history/createHashHistory';
-import router, { changePage } from './router';
+import saga from './saga';
+import * as actions from './actions';
 
-export { createBrowserHistory, createHashHistory, router, changePage };
+export { createBrowserHistory, createHashHistory, saga, actions };
