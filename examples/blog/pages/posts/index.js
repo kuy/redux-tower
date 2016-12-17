@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Header, Container, Breadcrumb, Divider } from 'semantic-ui-react';
+import { Grid, Menu, Header, Container, Breadcrumb, Divider } from 'semantic-ui-react';
 import { Link } from '../../sagas/router';
 
 class PostsIndex extends Component {
@@ -10,6 +10,7 @@ class PostsIndex extends Component {
       <Breadcrumb size='big'>
         <Breadcrumb.Section>Home</Breadcrumb.Section>
       </Breadcrumb>
+
       {posts.map(post =>
         <div>
           <Divider hidden />
@@ -19,6 +20,21 @@ class PostsIndex extends Component {
           <div dangerouslySetInnerHTML={{ __html: post.body }} />
         </div>
       )}
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Menu pagination>
+          <Menu.Item disabled>1</Menu.Item>
+          <Menu.Item>
+            <Link to='/posts?page=2'>2</Link>
+          </Menu.Item>
+          <Menu.Item>
+            <Link to='/posts?page=3'>3</Link>
+          </Menu.Item>
+          <Menu.Item>
+            <Link to='/posts?page=4'>4</Link>
+          </Menu.Item>
+        </Menu>
+      </div>
     </Container>;
   }
 }

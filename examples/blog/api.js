@@ -49,13 +49,15 @@ function toObj(pairs) {
 }
 
 export const posts = {
-  all({ keyword, offset = 0, limit = 2 }) {
+  all({ q, page = 1, limit = 2 } = {}) {
+    const offset = (page - 1) * limit;
+
     // Enumerate id of condidate pages
     let ids;
-    if (keyword) {
+    if (q) {
       ids = POSTS.list
         .map(id => POSTS.entities[id])
-        .filter(post => post.title.indexOf(keyword) !== -1)
+        .filter(post => post.title.indexOf(q) !== -1)
         .map(post => post.id);
     } else {
       ids = POSTS.list;

@@ -3,13 +3,13 @@ import router from './router';
 import * as api from '../api';
 import { requestFetchPosts, successFetchPosts, failureFetchPosts } from '../actions';
 
-function fetchPosts(keyword) {
-  return api.posts.all({ keyword });
+function fetchPosts(params) {
+  return api.posts.all(params);
 }
 
-export function* loadPosts(params = {}) {
+export function* loadPosts(params) {
   yield put(requestFetchPosts());
-  const { data, error } = yield call(fetchPosts, params.q);
+  const { data, error } = yield call(fetchPosts, params);
   if (data && !error) {
     yield put(successFetchPosts(data));
   } else {
