@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button, Icon, Header, Progress, Segment } from 'semantic-ui-react';
+import { Menu, Icon, Header, Progress, Segment } from 'semantic-ui-react';
 import { Link } from '../sagas/router';
 
 class Layout extends Component {
@@ -8,11 +8,17 @@ class Layout extends Component {
     const { loading, children } = this.props;
     return <div>
       <Segment>
-        <Button href='https://github.com/kuy/redux-saga-tower' icon='github' size='huge' color='black' circular floated='right' />
         <Header as='h1' style={{ margin: '.5rem' }}>
-          <Icon name='write' />
-          My First Blog
-          <Link to='/posts?q=Banana'>Posts</Link>
+          <Menu secondary size='huge'>
+            <Menu.Item header>
+              <Icon name='write' />
+              My First Blog
+            </Menu.Item>
+            <Menu.Item><Link to='/'>Home</Link></Menu.Item>
+            <Menu.Item><Link to='/posts'>Posts</Link></Menu.Item>
+            <Menu.Item><Link to='/about'>About</Link></Menu.Item>
+            <Menu.Item><Link external target='_blank' to='https://github.com/kuy/redux-saga-tower'>GitHub</Link></Menu.Item>
+          </Menu>
         </Header>
         <Progress color={loading ? 'blue' : 'grey'} disabled={!loading} percent={100} attached='bottom' indicating={loading} />
       </Segment>

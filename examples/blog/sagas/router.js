@@ -1,7 +1,6 @@
 import { put, call, fork } from 'redux-saga/effects';
-import { router, createBrowserHistory } from '../../../src/index';
+import { router, createBrowserHistory, changePage } from '../../../src/index';
 import createLink from '../../../src/react/link';
-import { changePage } from '../actions';
 import { loadPosts, loadPost } from './index';
 
 const history = createBrowserHistory();
@@ -9,13 +8,10 @@ export const Link = createLink(history);
 
 import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
+import About from '../pages/about';
 
 const routes = {
-  '/': function* indexPage() {
-    console.log('index');
-    yield call(loadPosts);
-    yield put(changePage(PostsIndex));
-  },
+  '/': '/posts',
   '/posts': function* postsIndexPage({ query }) {
     console.log(`posts.index`, query);
     yield call(loadPosts, query);
@@ -26,6 +22,7 @@ const routes = {
     yield call(loadPost, id);
     yield put(changePage(PostsShow));
   },
+  '/about': About,
 };
 
 export default function* routerSaga() {

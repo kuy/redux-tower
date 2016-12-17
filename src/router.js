@@ -1,7 +1,10 @@
 import { eventChannel } from 'redux-saga';
-import { take, call } from 'redux-saga/effects';
+import { take, call, put } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import qs from 'querystring';
+
+export const CHANGE_PAGE = 'CHANGE_PAGE';
+export const changePage = payload => ({ type: CHANGE_PAGE, payload });
 
 function prepareMatcher(routes) {
   const matcher = ruta3();
@@ -30,17 +33,49 @@ function parse(search) {
 
 function createHandler(matcher) {
   return function* handler(location) {
-    console.log('handler', matcher);
-    const { action, params, route, splats } = matcher.match(location.pathname);
-    yield call(action, { params, splats, route, query: parse(location.search) });
+    const matched = matcher.match(location.pathname);
+    if (matched) {
+      const { action, params, route, splats } = matched;
+      yield call(action, { params, splats, route, query: parse(location.search) });
+    } else {
+      console.error(`No route matched`);
+    }
   }
+}
+
+function createRouteAction(Page) {
+  const name = `action${Page.displayName || 'UnknownPage'}`;
+  const action = {
+    [name]: function* () {
+      yield put(changePage(Page));
+    }
+  };
+  return action[name];
+}
+
+function preprocess(routes) {
+  for (const path of Object.keys(routes)) {
+    const value = routes[path];
+
+    // Resolve redirect/alias
+    if (typeof value === 'string') {
+      routes[path] = routes[value];
+    }
+
+    // Resolve React component
+    if (value.prototype && typeof value.prototype.isReactComponent !== 'undefined') {
+      routes[path] = createRouteAction(value);
+    }
+  }
+
+  return routes;
 }
 
 export default function* router(history, routes) {
   const channel = createLocationChannel(history);
-  const handler = createHandler(prepareMatcher(routes));
+  const handler = createHandler(prepareMatcher(preprocess(routes)));
 
-  // Current path
+  // Initialize with the current location
   yield call(handler, history.location);
 
   while (true) {
