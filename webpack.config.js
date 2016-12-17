@@ -1,7 +1,9 @@
 'use strict';
 
 module.exports = {
-  entry: './example/src/index.js',
+  entry: {
+    blog: './examples/blog/index.js'
+  },
   module: {
     loaders: [{
       test: /\.js$/,
@@ -17,7 +19,7 @@ module.exports = {
   },
   output: {
     path: __dirname + '/build',
-    filename: 'bundle.js',
+    filename: '[name].bundle.js',
     publicPath: '/in-memory'
   },
   devtool: 'inline-source-map'
