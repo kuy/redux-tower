@@ -2,9 +2,7 @@
 
 import type { Action } from './actions';
 import { combineReducers } from 'redux';
-import {
-  CHANGE_PAGE, SUCCESS_FETCH_POSTS
-} from './actions';
+import { SUCCESS_FETCH_POSTS } from './actions';
 import Loading from './pages/loading';
 import router from '../../src/reducer';
 
