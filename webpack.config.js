@@ -2,6 +2,7 @@
 
 module.exports = {
   entry: {
+    minimum: './examples/minimum/index.js',
     blog: './examples/blog/index.js'
   },
   module: {

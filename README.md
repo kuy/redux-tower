@@ -17,12 +17,11 @@ npm install --save redux-saga-tower
 
 ## Why?
 
-+ react-router is just a component switcher.
++ react-router is just a component switcher. I don't want to depend on React component lifecycle.
 + react-router-redux doesn't help you to do something before showing a page component.
 + redux-saga is a library for async control flow.
-+ Okay, let's mix them!
 
-### redux-saga-router
+### About redux-saga-router
 
 [redux-saga-router](https://github.com/jfairbank/redux-saga-router) is a great library,
 which brings sagas to the chaotic router world and gives a way to do side effects when associated url is activated.
@@ -31,7 +30,76 @@ However, it can't be used to control the timing of showing the page component an
 
 ## Usage
 
-redux-saga-tower exports a saga, building blocks of Redux, and React components.
+Here is a SFA (Single File Application) that shows you a simple routing with side effects.
+
+```js
+// Pages
+function Navigation() {
+  return <ul>
+    <li><a href='/#/'>Index</a></li>
+    <li><a href='/#/tower'>Tower</a></li>
+  </ul>;
+}
+
+class Index extends Component {
+  render() {
+    return <div>
+      <h1>Index</h1>
+      <Navigation />
+      <p>Hi, I'm index page.</p>
+    </div>;
+  }
+}
+
+class Tower extends Component {
+  render() {
+    return <div>
+      <h1>Tower</h1>
+      <Navigation />
+      <p>Here is tower page. You waited a while for loading this page.</p>
+    </div>;
+  }
+}
+
+// Routes
+const routes = {
+  '/': Index,
+  *'/tower'() {
+    yield call(delay, 1000);
+    yield put(actions.changePage(Tower));
+  }
+};
+
+// History
+const history = createHashHistory();
+
+// Saga
+function* rootSaga() {
+  yield fork(routerSaga, history, routes);
+}
+
+// Reducer
+const reducer = combineReducers(
+  { router: routerReducer }
+);
+
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(reducer, {}, applyMiddleware(
+  sagaMiddleware, logger()
+));
+sagaMiddleware.run(rootSaga);
+
+ReactDOM.render(
+  <Provider store={store}>
+    <Router />
+  </Provider>,
+document.getElementById('container'));
+```
+
+
+## API / Building Blocks
+
+redux-saga-tower consists of some components, such as a saga, a reducer, an actions, and React components.
 In this section, I'd like to intrdouce them step by step and how to integrate with your Redux application.
 
 ### Routes
@@ -58,7 +126,7 @@ const routes = {
 
 ### History
 
-redux-saga-tower relies on [history](https://www.npmjs.com/package/history) package so that you can choose a strategy from hash based or History API.
+redux-saga-tower relies on [history](https://www.npmjs.com/package/history) package so that you can choose a strategy from Hash based or History API.
 
 ```js
 // History API
@@ -116,7 +184,8 @@ export default combineReducers(
 
 ### React components
 
-Two helper components are available.
+These React components will help you for building an application.
+I'm happy to hear feature requests and merge your PRs if you feel it doesn't have enough feature.
 
 #### `<Router>`
 
@@ -137,6 +206,7 @@ document.getElementById('container'));
 #### `<Link>`
 
 `<Link>` prevents browser's default behaviors and pushes a new path via `history` instance.
+You don't need to use this component if you have choose the Hash based strategy.
 
 ```js
 import { createBrowserHistory } from 'redux-saga-tower';
@@ -159,12 +229,6 @@ class Page extends Component {
 }
 ```
 
-### Minimum usage
-
-Here is a SFA (Single File Application) using redux-saga-tower.
-
-```js
-```
 
 ## Examples
 
@@ -183,6 +247,14 @@ npm start
 
 And then open `http://localhost:8080/` with your favorite browser.
 
+
+## Todo
+
++ Add option to rename reducer (redux-saga-tower assumes `router`)
++ More streamlined route definitions
++ Pass a previous page or route
++ Support stateless functional components
++ Provide an easy way to offset sub-directory name (`/blog/`)
 
 ## The Goal
 
