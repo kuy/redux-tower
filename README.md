@@ -121,6 +121,25 @@ const routes = {
     // Pass a component you want to show
     yield put(actions.changePage(Home));
   },
+
+  // Receive query string like '/posts?q=keyword'
+  // Use method syntax
+  *'/posts'({ query }) {
+    yield call(loadPosts, query);
+    yield put(actions.changePage(PostsIndex));
+  },
+
+  // Receive named parameters like '/posts/1'
+  '/posts/:id': function* postsShowPage({ params: { id } }) {
+    yield call(loadPost, id);
+    yield put(actions.changePage(PostsShow));
+  },
+
+  // Redirect to '/posts/:id' route with fixed parameter
+  '/about': '/posts/2',
+
+  // Assign React component directly
+  '/contact': Contact,
 };
 ```
 

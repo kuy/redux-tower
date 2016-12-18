@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-tower",
-  "description": "Saga-based router for Redux app",
+  "description": "Saga powered routing engine for Redux app.",
   "homepage": "https://github.com/kuy/redux-saga-tower",
   "authors": [
     "Yuki Kodama <endflow.net@gmail.com>"
@@ -12,6 +12,7 @@
   },
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --progress --content-base examples/blog/",
+    "build": "NODE_ENV=production ./node_modules/.bin/webpack",
     "test": "./node_modules/.bin/mocha --compilers js:babel-register test/spec/*.js",
     "flow": "./node_modules/.bin/flow"
   },
