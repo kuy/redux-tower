@@ -46,7 +46,7 @@ class Index extends Component {
     return <div>
       <h1>Index</h1>
       <Navigation />
-      <p>Hi, I'm index page.</p>
+      <p>Hi, here is index page.</p>
     </div>;
   }
 }
