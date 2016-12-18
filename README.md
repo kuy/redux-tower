@@ -241,7 +241,7 @@ npm start
 
 #### Todo
 
-+ Search feature
++ Cache feature
 + Auth (login/logout) feature
 + Admin features
 
@@ -250,6 +250,11 @@ And then open `http://localhost:8080/` with your favorite browser.
 
 ## Todo
 
++ Namespace
++ Rename action `CHANGE_PAGE` because it handle components, not page
++ Rename `page` to `component`
++ Nested routes
++ Provide a way to choose push or replace
 + Add option to rename reducer (redux-saga-tower assumes `router`)
 + More streamlined route definitions
 + Pass a previous page or route

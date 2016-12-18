@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Menu, Icon, Header, Progress, Segment } from 'semantic-ui-react';
-import { Link } from '../sagas/routes';
+import { Menu, Input, Icon, Header, Progress, Segment } from 'semantic-ui-react';
+import { history, Link } from '../sagas/routes';
 
 class Layout extends Component {
+  handleChange(e) {
+    history.push(`/posts?q=${e.target.value}`);
+  }
+
   render() {
     const { loading, children } = this.props;
     return <div>
@@ -17,7 +21,12 @@ class Layout extends Component {
             <Menu.Item><Link to='/'>Home</Link></Menu.Item>
             <Menu.Item><Link to='/posts'>Posts</Link></Menu.Item>
             <Menu.Item><Link to='/about'>About</Link></Menu.Item>
-            <Menu.Item><Link external target='_blank' to='https://github.com/kuy/redux-saga-tower'>GitHub</Link></Menu.Item>
+            <Menu.Menu position='right'>
+              <Menu.Item><Link external target='_blank' to='https://github.com/kuy/redux-saga-tower'>GitHub</Link></Menu.Item>
+              <Menu.Item>
+                <Input onChange={this.handleChange.bind(this)} icon='search' placeholder='Search...' />
+              </Menu.Item>
+            </Menu.Menu>
           </Menu>
         </Header>
         <Progress color={loading ? 'blue' : 'grey'} disabled={!loading} percent={100} attached='bottom' indicating={loading} />

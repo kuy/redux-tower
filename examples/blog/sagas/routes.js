@@ -5,7 +5,7 @@ import createLink from '../../../src/react/create-link';
 import { loadPosts, loadPost } from './index';
 import Loading from '../pages/loading';
 
-const history = createBrowserHistory();
+export const history = createBrowserHistory();
 export const Link = createLink(history);
 
 import PostsIndex from '../pages/posts/index';
