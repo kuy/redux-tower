@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Header, Container, Breadcrumb, Divider } from 'semantic-ui-react';
-import { Link } from '../../sagas/routes';
+import { Link } from '../../../../src/react/index';
 import Pagination from '../../components/pagination';
 
 class PostsIndex extends Component {

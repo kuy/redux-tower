@@ -1,4 +1,4 @@
-import { INIT_PAGE, CHANGE_PAGE, UPDATE_PATH_INFO } from './actions';
+import { INIT, CHANGE_PAGE, UPDATE_PATH_INFO } from './actions';
 
 const initial = {
   page: undefined,
@@ -7,11 +7,14 @@ const initial = {
   query: undefined,
   splats: undefined,
   route: undefined,
+  offset: undefined,
 };
 
 export default function routerReducer(state = initial, { type, payload }) {
   switch (type) {
-    case INIT_PAGE: case CHANGE_PAGE:
+    case INIT:
+      return { ...state, ...payload };
+    case CHANGE_PAGE:
       return { ...state, page: payload };
     case UPDATE_PATH_INFO:
       return { ...state, ...payload };

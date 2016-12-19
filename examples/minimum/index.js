@@ -12,8 +12,8 @@ import { Router } from '../../src/react/index';
 // Pages
 function Navigation() {
   return <ul>
-    <li><a href='/#/'>Index</a></li>
-    <li><a href='/#/tower'>Tower</a></li>
+    <li><a href='#/'>Index</a></li>
+    <li><a href='#/tower'>Tower</a></li>
   </ul>;
 }
 
@@ -51,7 +51,7 @@ const history = createHashHistory();
 
 // Saga
 function* rootSaga() {
-  yield fork(routerSaga, history, routes);
+  yield fork(routerSaga, { history, routes });
 }
 
 // Reducer

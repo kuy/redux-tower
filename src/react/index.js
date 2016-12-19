@@ -1,4 +1,4 @@
 import Router from './router';
-import createLink from './create-link';
+import Link from './link';
 
-export { Router, createLink };
+export { Router, Link };

@@ -11,7 +11,7 @@
     "url": "https://github.com/kuy/redux-saga-tower.git"
   },
   "scripts": {
-    "start": "./node_modules/.bin/webpack-dev-server --progress --content-base examples/blog/",
+    "start": "./node_modules/.bin/webpack-dev-server --progress --content-base examples/",
     "build": "NODE_ENV=production ./node_modules/.bin/webpack",
     "test": "./node_modules/.bin/mocha --compilers js:babel-register test/spec/*.js",
     "flow": "./node_modules/.bin/flow"
