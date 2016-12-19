@@ -2,7 +2,7 @@ import { eventChannel } from 'redux-saga';
 import { take, call, put } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import qs from 'querystring';
-import { initPage, changePage, updatePathInfo } from './actions';
+import { initComponent, changeComponent, updatePathInfo } from './actions';
 
 function prepareMatcher(routes) {
   const matcher = ruta3();
@@ -49,11 +49,11 @@ function createHandler(matcher) {
   }
 }
 
-function createRouteAction(Page) {
-  const name = `generated${Page.displayName || 'Unknown'}Page`;
+function createRouteAction(Component) {
+  const name = `generated${Component.displayName || 'Unknown'}Component`;
   const action = {
     [name]: function* () {
-      yield put(changePage(Page));
+      yield put(changeComponent(Component));
     }
   };
   return action[name];
@@ -79,7 +79,7 @@ function preprocess(routes) {
 
 export default function* towerSaga(history, routes, initial) {
   // Set initial component
-  yield put(initPage(initial));
+  yield put(initComponent(initial));
 
   const channel = createLocationChannel(history);
   const handler = createHandler(prepareMatcher(preprocess(routes)));
