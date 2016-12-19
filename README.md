@@ -66,7 +66,7 @@ const routes = {
   '/': Index,
   *'/tower'() {
     yield call(delay, 1000);
-    yield put(actions.changePage(Tower));
+    yield put(actions.changeComponent(Tower));
   }
 };
 
@@ -119,20 +119,20 @@ const routes = {
     yield put(data(...));
 
     // Pass a component you want to show
-    yield put(actions.changePage(Home));
+    yield put(actions.changeComponent(Home));
   },
 
   // Receive query string like '/posts?q=keyword'
   // Use method syntax
   *'/posts'({ query }) {
     yield call(loadPosts, query);
-    yield put(actions.changePage(PostsIndex));
+    yield put(actions.changeComponent(PostsIndex));
   },
 
   // Receive named parameters like '/posts/1'
   '/posts/:id': function* postsShowPage({ params: { id } }) {
     yield call(loadPost, id);
-    yield put(actions.changePage(PostsShow));
+    yield put(actions.changeComponent(PostsShow));
   },
 
   // Redirect to '/posts/:id' route with fixed parameter

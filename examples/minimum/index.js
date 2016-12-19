@@ -42,7 +42,7 @@ const routes = {
   '/': Index,
   *'/tower'() {
     yield call(delay, 1000);
-    yield put(actions.changePage(Tower));
+    yield put(actions.changeComponent(Tower));
   }
 };
 

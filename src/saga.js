@@ -2,7 +2,7 @@ import { eventChannel } from 'redux-saga';
 import { call, fork, put, select, take } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import {
-  init, changeComponent, updatePathInfo,
+  unprefix, init, changeComponent, updatePathInfo,
   PUSH, REPLACE, GO, GO_BACK, GO_FORWARD
 } from './actions';
 import { parseQueryString, normOffset, removeOffset, toCamelCase } from './utils';
@@ -105,7 +105,7 @@ function* handleHistoryAction({ history }) {
       }
     }
 
-    history[toCamelCase(type)](...payload);
+    history[toCamelCase(unprefix(type))](...payload);
   }
 }
 
