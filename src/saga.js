@@ -1,8 +1,11 @@
 import { eventChannel } from 'redux-saga';
-import { take, call, put } from 'redux-saga/effects';
+import { call, fork, put, select, take } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
-import qs from 'querystring';
-import { initComponent, changeComponent, updatePathInfo } from './actions';
+import {
+  init, changeComponent, updatePathInfo,
+  PUSH, REPLACE, GO, GO_BACK, GO_FORWARD
+} from './actions';
+import { parseQueryString, normOffset, removeOffset, toCamelCase } from './utils';
 
 function prepareMatcher(routes) {
   const matcher = ruta3();
@@ -22,29 +25,24 @@ function createLocationChannel(history) {
   });
 }
 
-function parse(search) {
-  if (search.indexOf('?') === 0) {
-    search = search.slice(1);
-  }
-  return qs.parse(search);
-}
-
-function createHandler(matcher) {
+// offset: normalized offset
+function createHandler(matcher, offset) {
   return function* handler(location) {
-    const matched = matcher.match(location.pathname);
+    const pathname = removeOffset(location.pathname, offset);
+    const matched = matcher.match(pathname);
     if (matched) {
       const { action, params, route, splats } = matched;
       const info = {
-        path: location.pathname,
+        path: pathname,
         params,
-        query: parse(location.search),
+        query: parseQueryString(location.search),
         splats,
         route,
       };
       yield put(updatePathInfo(info));
       yield call(action, info);
     } else {
-      console.error(`No route matched: ${location.pathname}`);
+      console.error(`No matched route: ${pathname} (original='${location.pathname}', offset='${offset}')`);
     }
   }
 }
@@ -77,12 +75,14 @@ function preprocess(routes) {
   return routes;
 }
 
-export default function* towerSaga(history, routes, initial) {
-  // Set initial component
-  yield put(initComponent(initial));
+function* handleLocationChange({ history, routes, initial, offset }) {
+  offset = normOffset(offset);
+
+  // Set initial state
+  yield put(init({ page: initial, offset }));
 
   const channel = createLocationChannel(history);
-  const handler = createHandler(prepareMatcher(preprocess(routes)));
+  const handler = createHandler(prepareMatcher(preprocess(routes)), offset);
 
   // Initialize with the current location
   yield call(handler, history.location);
@@ -91,4 +91,25 @@ export default function* towerSaga(history, routes, initial) {
     const { location } = yield take(channel);
     yield call(handler, location);
   }
+}
+
+function* handleHistoryAction({ history }) {
+  while (true) {
+    const { type, payload } = yield take([PUSH, REPLACE, GO, GO_BACK, GO_FORWARD]);
+
+    if (type === PUSH || type === REPLACE) {
+      // Prepend offset to path at first argument in payload
+      const { offset } = yield select(state => state.router);
+      if (offset) {
+        payload[0] = offset + payload[0];
+      }
+    }
+
+    history[toCamelCase(type)](...payload);
+  }
+}
+
+export default function* routerSaga(options) {
+  yield fork(handleLocationChange, options);
+  yield fork(handleHistoryAction, options);
 }

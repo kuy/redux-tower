@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Menu } from 'semantic-ui-react';
-import { Link } from '../sagas/routes';
+import { Link } from '../../../src/react/index';
 
 class Pagination extends Component {
   render() {

@@ -1,16 +1,14 @@
 import { put, call, fork } from 'redux-saga/effects';
 import { createBrowserHistory, actions } from '../../../src/index';
 import router from '../../../src/saga';
-import createLink from '../../../src/react/create-link';
 import { loadPosts, loadPost } from './index';
-import Loading from '../pages/loading';
-
-export const history = createBrowserHistory();
-export const Link = createLink(history);
 
 import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
 import About from '../pages/about';
+import Loading from '../pages/loading';
+
+const offset = 'blog';
 
 const routes = {
   '/': '/posts',
@@ -26,5 +24,6 @@ const routes = {
 };
 
 export default function* routesSaga() {
-  yield fork(router, history, routes, Loading);
+  const history = createBrowserHistory();
+  yield fork(router, { history, routes, initial: Loading, offset });
 }

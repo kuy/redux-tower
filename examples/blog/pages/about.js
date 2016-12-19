@@ -9,7 +9,7 @@ export default class About extends Component {
   render() {
     return <Container>
       <Header>About</Header>
-      <p>I'm <a href="http://twitter.com/kuy">kuy</a>.</p>
+      <p>I'm <a href="https://twitter.com/kuy" target="_blank">@kuy</a>.</p>
     </Container>;
   }
 }
