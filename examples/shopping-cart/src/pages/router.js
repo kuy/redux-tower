@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 class Router extends Component {
   render() {
-    const { page: PageComponent } = this.props.route;
+    const { component: PageComponent } = this.props.route;
     return <PageComponent />;
   }
 }

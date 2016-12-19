@@ -14,11 +14,11 @@ const routes = {
   '/': '/posts',
   '/posts': function* postsIndexPage({ query }) {
     yield call(loadPosts, query);
-    yield put(actions.changePage(PostsIndex));
+    yield put(actions.changeComponent(PostsIndex));
   },
   '/posts/:id': function* postsShowPage({ params: { id } }) {
     yield call(loadPost, id);
-    yield put(actions.changePage(PostsShow));
+    yield put(actions.changeComponent(PostsShow));
   },
   '/about': About,
 };

@@ -2,7 +2,7 @@ import { eventChannel } from 'redux-saga';
 import { call, fork, put, select, take } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import {
-  init, changePage, updatePathInfo,
+  init, changeComponent, updatePathInfo,
   PUSH, REPLACE, GO, GO_BACK, GO_FORWARD
 } from './actions';
 import { parseQueryString, normOffset, removeOffset, toCamelCase } from './utils';
@@ -47,11 +47,11 @@ function createHandler(matcher, offset) {
   }
 }
 
-function createRouteAction(Page) {
-  const name = `generated${Page.displayName || 'Unknown'}Page`;
+function createRouteAction(Component) {
+  const name = `generated${Component.displayName || 'Unknown'}Component`;
   const action = {
     [name]: function* () {
-      yield put(changePage(Page));
+      yield put(changeComponent(Component));
     }
   };
   return action[name];

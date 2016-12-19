@@ -1,9 +1,9 @@
 const createActionCreator = type => payload => ({ type, payload });
 
 export const INIT = '@@redux-saga-tower/INIT';
-export const CHANGE_PAGE = '@@redux-saga-tower/CHANGE_PAGE';
+export const CHANGE_COMPONENT = '@@redux-saga-tower/CHANGE_COMPONENT';
 export const init = createActionCreator(INIT);
-export const changePage = createActionCreator(CHANGE_PAGE);
+export const changeComponent = createActionCreator(CHANGE_COMPONENT);
 
 export const UPDATE_PATH_INFO = '@@redux-saga-tower/UPDATE_PATH_INFO';
 export const updatePathInfo = createActionCreator(UPDATE_PATH_INFO);

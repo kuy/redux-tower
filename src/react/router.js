@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 
 class Router extends Component {
   render() {
-    const { page: PageComponent } = this.props.router;
-    if (PageComponent) {
-      return <PageComponent />;
+    const { component: RouterComponent } = this.props.router;
+    if (RouterComponent) {
+      return <RouterComponent />;
     } else {
       // XXX: should render given something...?
       return <div></div>;
