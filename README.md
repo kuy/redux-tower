@@ -23,9 +23,27 @@ npm install --save redux-saga-tower
 
 ### About redux-saga-router
 
-[redux-saga-router](https://github.com/jfairbank/redux-saga-router) is a great library,
-which brings sagas to the chaotic router world and gives a way to do side effects when associated url is activated.
-However, it can't be used to control the timing of showing the page component and what component should be shown.
+[redux-saga-router](https://github.com/jfairbank/redux-saga-router) is a great routing library,
+which brings sagas to the chaotic router world and gives a way to do side effects in redux-saga way when associated url is activated.
+However, it can't be used to control the timing of showing the page component and what component should be shown,
+because both react-router and redux-saga-router are working separately. I feel it annoying to maintain the separated route definitions.
+
+
+## Examples
+
+### Online Demo: [Minimum](http://kuy.github.io/redux-saga-tower/minimum/) / [Blog](http://kuy.github.io/redux-saga-tower/blog/) 
+
+```
+npm install
+npm start
+```
+
+And then open `http://localhost:8080/` with your favorite browser.
+
++ [Minimum](https://github.com/kuy/redux-saga-tower/tree/master/examples/minimum): Minimum usage with Hash based history.
++ [Blog](https://github.com/kuy/redux-saga-tower/tree/master/examples/blog): Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
+
+You can use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension) to see the store and the actions being fired.
 
 
 ## Usage
@@ -239,20 +257,6 @@ class Page extends Component {
 }
 ```
 
-
-## Examples
-
-```
-npm install
-npm start
-```
-
-And then open `http://localhost:8080/` with your favorite browser.
-
-+ [Minimum](https://github.com/kuy/redux-saga-tower/tree/master/examples/minimum): Minimum usage with Hash based history.
-+ [Blog](https://github.com/kuy/redux-saga-tower/tree/master/examples/blog): Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
-
-You can use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension) to see the store and the actions being fired.
 
 ## The Goal
 
