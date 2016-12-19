@@ -75,8 +75,9 @@ function preprocess(routes) {
   return routes;
 }
 
-function* handleLocationChange({ history, routes, initial, offset }) {
-  offset = normOffset(offset);
+function* handleLocationChange({ history, routes, initial }) {
+  // Use initial path as offset
+  const offset = normOffset(history.location.pathname);
 
   // Set initial state
   yield put(init({ page: initial, offset }));

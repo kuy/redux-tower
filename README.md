@@ -167,7 +167,6 @@ This saga takes an Object that contains following properties.
 + history: An instance of `createBrowserHistory()` or `createHashHistory()`.
 + routes: A routing defined in previous section.
 * initial: [Optional] Initial component, which is used until a location change is occurred.
-* offset: [Optional] A name to offset the path.
 
 ```js
 import { saga as router } from 'redux-saga-tower';
@@ -253,6 +252,7 @@ And then open `http://localhost:8080/` with your favorite browser.
 + [Minimum](https://github.com/kuy/redux-saga-tower/tree/master/examples/minimum): Minimum usage with Hash based history.
 + [Blog](https://github.com/kuy/redux-saga-tower/tree/master/examples/blog): Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
 
+You can use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension) to see the store and the actions being fired.
 
 ## The Goal
 
