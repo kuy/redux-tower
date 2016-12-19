@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Menu, Input, Icon, Header, Progress, Segment } from 'semantic-ui-react';
-import { history, Link } from '../sagas/routes';
+import { actions } from '../../../src/index';
+import { Link } from '../../../src/react/index';
 
 class Layout extends Component {
   handleChange(e) {
-    history.push(`/posts?q=${e.target.value}`);
+    this.props.dispatch(actions.push(`/posts?q=${e.target.value}`));
   }
 
   render() {

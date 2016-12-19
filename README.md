@@ -36,8 +36,8 @@ Here is a SFA (Single File Application) that shows you a simple routing with sid
 // Pages
 function Navigation() {
   return <ul>
-    <li><a href='/#/'>Index</a></li>
-    <li><a href='/#/tower'>Tower</a></li>
+    <li><a href='#/'>Index</a></li>
+    <li><a href='#/tower'>Tower</a></li>
   </ul>;
 }
 
@@ -75,7 +75,7 @@ const history = createHashHistory();
 
 // Saga
 function* rootSaga() {
-  yield fork(routerSaga, history, routes);
+  yield fork(routerSaga, { history, routes });
 }
 
 // Reducer
@@ -149,11 +149,9 @@ redux-saga-tower relies on [history](https://www.npmjs.com/package/history) pack
 
 ```js
 // History API
-
 import { createBrowserHistory as createHistory } from 'redux-saga-tower';
 
 // Or Hash based
-
 import { createHashHistory as createHistory } from 'redux-saga-tower';
 
 // ...
@@ -164,11 +162,12 @@ const history = createHistory();
 ### Saga
 
 A coordinator who detects location changes, updates location data in Redux's store, and activates associated action.
-This saga takes two or three arguments: history, routes, and initial.
+This saga takes an Object that contains following properties.
 
 + history: An instance of `createBrowserHistory()` or `createHashHistory()`.
 + routes: A routing defined in previous section.
-* initial: Initial component, which is used until a location change is occurred. Optional.
+* initial: [Optional] Initial component, which is used until a location change is occurred.
+* offset: [Optional] A name to offset the path.
 
 ```js
 import { saga as router } from 'redux-saga-tower';
@@ -176,7 +175,7 @@ import { saga as router } from 'redux-saga-tower';
 // ...
 
 export default function rootSaga() {
-  yield fork(router, history, routes);
+  yield fork(router, { history, routes });
 
   // ...
 }
@@ -224,17 +223,10 @@ document.getElementById('container'));
 
 #### `<Link>`
 
-`<Link>` prevents browser's default behaviors and pushes a new path via `history` instance.
-You don't need to use this component if you have choose the Hash based strategy.
+`<Link>` component helps you to put a link in your Redux application.
 
 ```js
-import { createBrowserHistory } from 'redux-saga-tower';
-import { createLink } from 'redux-saga-tower/react';
-
-// ...
-
-const history = createBrowserHistory();
-const Link = createLink(history);
+import { Link } from 'redux-saga-tower/react';
 
 // ...
 
@@ -251,34 +243,19 @@ class Page extends Component {
 
 ## Examples
 
-### Blog
-
 ```
 npm install
 npm start
 ```
-
-#### Todo
-
-+ Cache feature
-+ Auth (login/logout) feature
-+ Admin features
 
 And then open `http://localhost:8080/` with your favorite browser.
 
 
 ## Todo
 
-+ Namespace
-+ Rename action `CHANGE_PAGE` because it handle components, not page
-+ Rename `page` to `component`
-+ Nested routes
 + Provide a way to choose push or replace
-+ Add option to rename reducer (redux-saga-tower assumes `router`)
-+ More streamlined route definitions
 + Pass a previous page or route
-+ Support stateless functional components
-+ Provide an easy way to offset sub-directory name (`/blog/`)
+
 
 ## The Goal
 
