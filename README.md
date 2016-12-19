@@ -250,11 +250,8 @@ npm start
 
 And then open `http://localhost:8080/` with your favorite browser.
 
-
-## Todo
-
-+ Provide a way to choose push or replace
-+ Pass a previous page or route
++ [Minimum](https://github.com/kuy/redux-saga-tower/tree/master/examples/minimum): Minimum usage with Hash based history.
++ [Blog](https://github.com/kuy/redux-saga-tower/tree/master/examples/blog): Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
 
 
 ## The Goal
@@ -325,11 +322,6 @@ const routes = {
 ```
 
 
-## License
-
-MIT
-
-
 ## Author
 
 Yuki Kodama / [@kuy](https://twitter.com/kuy)
@@ -339,3 +331,8 @@ Yuki Kodama / [@kuy](https://twitter.com/kuy)
 
 redux-saga-tower has inspired by [redux-saga-router](https://github.com/jfairbank/redux-saga-router).
 Big thanks to [@jfairbank](https://github.com/jfairbank).
+
+
+## License
+
+MIT
