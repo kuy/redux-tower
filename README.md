@@ -2,10 +2,10 @@
 
 [Saga](https://github.com/yelouafi/redux-saga) powered routing engine for [Redux](http://redux.js.org/) apps.
 
-redux-saga-tower provides a way to fully control routing with its related side effects
-such as data fetching, user authentication.
+redux-saga-tower provides a way to fully control client-side routing with its related side effects
+such as data fetching, user authentication, fancy animations.
 
-**NOTICE: This package is UNDER DEVELOPMENT. API will be changed suddenly. Do NOT use in production.**
+**NOTICE: This package is ACTIVELY under development. API (both public and internal) may change suddenly. Do NOT use in production.**
 
 
 ## Installation
@@ -13,6 +13,12 @@ such as data fetching, user authentication.
 ```
 npm install --save redux-saga-tower
 ```
+
+
+## The Goal
+
++ Integrated, Battery-included, but Replaceable
++ Affinity with Redux
 
 
 ## Why?
@@ -271,7 +277,7 @@ class Page extends Component {
 ```
 
 
-## The Goal
+## The Blueprint (not implemented all)
 
 ```js
 const routes = {
