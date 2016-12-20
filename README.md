@@ -8,7 +8,7 @@ such as data fetching, user authentication.
 **NOTICE: This package is UNDER DEVELOPMENT. API will be changed suddenly. Do NOT use in production.**
 
 
-## Install
+## Installation
 
 ```
 npm install --save redux-saga-tower
@@ -31,7 +31,17 @@ because both react-router and redux-saga-router are working separately. I feel i
 
 ## Examples
 
-### Online Demo: [Minimum](http://kuy.github.io/redux-saga-tower/minimum/) / [Blog](http://kuy.github.io/redux-saga-tower/blog/) 
+### Online Demo
+
++ **[Minimum](https://github.com/kuy/redux-saga-tower/tree/master/examples/minimum)**: [Demo](http://kuy.github.io/redux-saga-tower/minimum/) | Minimum usage example with Hash based history.
++ **[Blog](https://github.com/kuy/redux-saga-tower/tree/master/examples/blog)**: [Demo](http://kuy.github.io/redux-saga-tower/blog/) | Real World Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
+
+[redux-logger](https://github.com/evgenyrodionov/redux-logger) is enabled. Open the JavaScript console of developer tools in your browser.
+You can also use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension) to see the store and the actions being fired.
+
+### Try in local
+
+Clone this repository and run following npm scripts.
 
 ```
 npm install
@@ -39,11 +49,6 @@ npm start
 ```
 
 And then open `http://localhost:8080/` with your favorite browser.
-
-+ [Minimum](https://github.com/kuy/redux-saga-tower/tree/master/examples/minimum): Minimum usage with Hash based history.
-+ [Blog](https://github.com/kuy/redux-saga-tower/tree/master/examples/blog): Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
-
-You can use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension) to see the store and the actions being fired.
 
 
 ## Usage
@@ -117,12 +122,15 @@ document.getElementById('container'));
 
 ## API / Building Blocks
 
-redux-saga-tower consists of some components, such as a saga, a reducer, an actions, and React components.
-In this section, I'd like to intrdouce them step by step and how to integrate with your Redux application.
+redux-saga-tower consists of several different kinds of elements/components.
+In this section, I'd like to introduce them step by step and how to integrate with your Redux application.
 
 ### Routes
 
-First of all, you need to define the routes with actions.
+First of all, you need to have the route definition which contains URL patterns and route actions.
+Behavior is deadly simple. When a url pattern is activated, the engine tests URL patterns, and pick a route action from your definition, and calls it.
+The URL pattern is a plain string, but is able to capture a part of URL and captured values are passed to a route action as named parameters.
+You can write a route action includes async control flows and interactions with Redux naturally thanks to redux-saga.
 
 ```js
 import { actions } from 'redux-saga-tower';
@@ -156,14 +164,14 @@ const routes = {
   // Redirect to '/posts/:id' route with fixed parameter
   '/about': '/posts/2',
 
-  // Assign React component directly
+  // Assign React component directly (except Stateless Functional Components)
   '/contact': Contact,
 };
 ```
 
 ### History
 
-redux-saga-tower relies on [history](https://www.npmjs.com/package/history) package so that you can choose a strategy from Hash based or History API.
+redux-saga-tower is built on [history](https://www.npmjs.com/package/history) package so that you can choose a strategy from Hash based or History API.
 
 ```js
 // History API
@@ -179,11 +187,16 @@ const history = createHistory();
 
 ### Saga
 
-A coordinator who detects location changes, updates location data in Redux's store, and activates associated action.
-This saga takes an Object that contains following properties.
+The core of routing engine, which mainly have two respnsibilities:
+
++ Detects location changes from `history` instance, reflects location data to Redux's store, and triggers route actions
++ Watches history related Redux's actions and operates `history` instance
+
+Since it's provided as a saga, what you have to do is just launching it using `fork` effect in the root saga of your application.
+Don't forget to pass the option when you fork. Here is a list of options.
 
 + history: An instance of `createBrowserHistory()` or `createHashHistory()`.
-+ routes: A routing defined in previous section.
++ routes: A route definition that previously introduced.
 * initial: [Optional] Initial component, which is used until a location change is occurred.
 
 ```js
@@ -205,7 +218,7 @@ A reducer is used to expose the location data to Redux's store.
 + path: String. Path string, which is stripped a query string.
 + params: Object. Named parameters, which is mapped with placeholders in route patterns. `/users/:id` with `/users/1` gets `{ id: '1' }`.
 + query: Object. Parsed query string. `/search?q=hoge` gets `{ q: 'hoge' }`.
-+ splats: Array. *WIP*
++ splats: Array. *[WIP]*
 
 ```js
 import { reducer as router } from 'redux-saga-tower';
@@ -220,7 +233,7 @@ export default combineReducers(
 ### React components
 
 These React components will help you for building an application.
-I'm happy to hear feature requests and merge your PRs if you feel it doesn't have enough feature.
+I'm happy to hear feature requests and merge your PRs if you feel it doesn't satisfy your needs.
 
 #### `<Router>`
 
