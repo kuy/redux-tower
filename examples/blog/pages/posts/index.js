@@ -13,7 +13,7 @@ class PostsIndex extends Component {
       </Breadcrumb>
 
       {posts.map(post =>
-        <div>
+        <div key={post.id}>
           <Divider hidden />
           <Header as='h2'>
             <Link to={`/posts/${post.id}`}>{post.title}</Link>

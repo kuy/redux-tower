@@ -11,10 +11,10 @@ class Pagination extends Component {
 
     const items = [];
     if (0 < page - 1) {
-      items.push(<Link to={`/posts?page=${page - 1}`} className='item'>{page - 1}</Link>);
+      items.push(<Link to={`/posts?page=${page - 1}`} key={page - 1} className='item'>{page - 1}</Link>);
     }
-    items.push(<Menu.Item active>{page}</Menu.Item>);
-    items.push(<Link to={`/posts?page=${page + 1}`} className='item'>{page + 1}</Link>);
+    items.push(<Menu.Item active key={page}>{page}</Menu.Item>);
+    items.push(<Link to={`/posts?page=${page + 1}`} key={page + 1} className='item'>{page + 1}</Link>);
 
     return <div style={{ display: 'flex', justifyContent: 'center' }}>
       <Menu pagination>{items}</Menu>
