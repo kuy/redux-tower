@@ -1,5 +1,12 @@
 // @flow
 
+export type PostId = string;
+export type Post = {
+  id: PostId,
+  title: string,
+  body: string,
+};
+
 const POSTS = {
   list: ['0', '1', '2', '3', '4'],
   entities: {
@@ -36,7 +43,14 @@ const POSTS = {
   },
 };
 
-function response(data) {
+export type ResponseData = {
+  data: {
+    list: Array<PostId>,
+    entities: { [PostId]: Post },
+  }
+};
+
+function response(data): Promise<ResponseData> {
   return new Promise(resolve => {
     // Simulate communication delay
     setTimeout(() => {
@@ -50,12 +64,12 @@ function toObj(pairs) {
 }
 
 export const posts = {
-  all({ q, page = 1, limit = 2 } = {}) {
+  all({ q, page = 1, limit = 2 }: { q?: string, page?: number, limit?: number } = {}) {
     const offset = (page - 1) * limit;
 
     // Enumerate id of condidate pages
     let ids;
-    if (q) {
+    if (typeof q !== 'undefined') {
       q = q.toLowerCase();
       ids = POSTS.list
         .map(id => POSTS.entities[id])
@@ -75,7 +89,7 @@ export const posts = {
       }
     });
   },
-  one(id) {
+  one(id: PostId) {
     return response({
       data: {
         list: [id],

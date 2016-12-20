@@ -5,11 +5,10 @@ import { combineReducers } from 'redux';
 import { SUCCESS_FETCH_POSTS } from './actions';
 import Loading from './pages/loading';
 import router from '../../src/reducer';
-
-type Post = { id: string, title: string, body: string };
+import type { PostId, Post } from './api';
 
 type AppState = {};
-type PostsState = { list: Array<string>, entities: { [key: string]: Post } };
+type PostsState = { list: Array<PostId>, entities: { [PostId]: Post } };
 
 export type State = {
   app: AppState,
@@ -29,10 +28,10 @@ const initial: State = {
 const handlers = {
   app: {},
   posts: {
-    REQUEST_FETCH_POSTS: state => {
+    REQUEST_FETCH_POSTS: (state: PostsState): PostsState => {
       return { ...state, status: 'working', error: false };
     },
-    SUCCESS_FETCH_POSTS: (state, { payload: { list, entities } }) => {
+    SUCCESS_FETCH_POSTS: (state: PostsState, { payload: { list, entities } }: Action): PostsState => {
       return { 
         ...state,
         status: 'ready',
