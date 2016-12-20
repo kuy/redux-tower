@@ -5,7 +5,8 @@
 redux-saga-tower provides a way to fully control client-side routing with its related side effects
 such as data fetching, user authentication, fancy animations.
 
-**NOTICE: This package is ACTIVELY under development. API (both public and internal) may change suddenly. Do NOT use in production.**
+**NOTICE: This package is ACTIVELY under development. 
+API (both public and internal) may change suddenly. Do NOT use in production.**
 
 
 ## Installation
@@ -23,9 +24,9 @@ npm install --save redux-saga-tower
 
 ## Why?
 
-+ react-router is just a component switcher. I don't want to depend on React component lifecycle.
-+ react-router-redux doesn't help you to do something before showing a page component.
-+ redux-saga is a library for async control flow.
++ [react-router](https://github.com/ReactTraining/react-router) is just a component switcher. I don't want to depend on React component lifecycle.
++ [react-router-redux](https://github.com/reactjs/react-router-redux) doesn't help you to do something before showing a page component.
++ [redux-saga](https://github.com/yelouafi/redux-saga) brings long-running processes with async control flow to Redux.
 
 ### About redux-saga-router
 
