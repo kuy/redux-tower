@@ -3,10 +3,12 @@ import { connect } from 'react-redux';
 import { Menu, Input, Icon, Header, Progress, Segment } from 'semantic-ui-react';
 import { actions } from '../../../src/index';
 import { Link } from '../../../src/react/index';
+import { preflightRequestSearch } from '../actions';
 
 class Layout extends Component {
   handleChange(e) {
-    this.props.dispatch(actions.push(`/posts?q=${e.target.value}`));
+    const action = actions.push(`/posts?q=${e.target.value}`);
+    this.props.dispatch(preflightRequestSearch(action));
   }
 
   render() {

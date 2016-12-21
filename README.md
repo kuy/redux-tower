@@ -5,7 +5,7 @@
 redux-saga-tower provides a way to fully control client-side routing with its related side effects
 such as data fetching, user authentication, fancy animations.
 
-**NOTICE: This package is ACTIVELY under development. 
+**NOTICE: This package is ACTIVELY under development.  
 API (both public and internal) may change suddenly. Do NOT use in production.**
 
 
