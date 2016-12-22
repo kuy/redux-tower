@@ -1,4 +1,4 @@
-import { eventChannel } from 'redux-saga';
+import { eventChannel, takeLatest } from 'redux-saga';
 import { call, fork, put, select, take } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import {
@@ -27,7 +27,8 @@ function createLocationChannel(history) {
 
 // offset: normalized offset
 function createHandler(matcher, offset) {
-  return function* handler(location) {
+  // TODO: Handle 'action' argument
+  return function* handler({ location, action }) {
     const pathname = removeOffset(location.pathname, offset);
     const matched = matcher.match(pathname);
     if (matched) {
@@ -82,16 +83,14 @@ function* handleLocationChange({ history, routes, initial }) {
   // Set initial state
   yield put(init({ page: initial, offset }));
 
-  const channel = createLocationChannel(history);
+  const location = createLocationChannel(history);
   const handler = createHandler(prepareMatcher(preprocess(routes)), offset);
 
   // Initialize with the current location
-  yield call(handler, history.location);
+  yield call(handler, { location: history.location });
 
-  while (true) {
-    const { location } = yield take(channel);
-    yield call(handler, location);
-  }
+  // Routing
+  yield takeLatest(location, handler);
 }
 
 function* handleHistoryAction({ history }) {
