@@ -1,5 +1,5 @@
 import { eventChannel, takeLatest } from 'redux-saga';
-import { call, fork, put, select, take } from 'redux-saga/effects';
+import { call, fork, put, select, take, cancelled } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import {
   unprefix, init, changeComponent, updatePathInfo,
@@ -26,22 +26,28 @@ function createLocationChannel(history) {
 }
 
 // offset: normalized offset
-function createHandler(matcher, offset) {
-  // TODO: Handle 'action' argument
+function createHandler(matcher, offset, cancel) {
   return function* handler({ location, action }) {
+    // TODO: Handle 'action' argument
     const pathname = removeOffset(location.pathname, offset);
     const matched = matcher.match(pathname);
     if (matched) {
       const { action, params, route, splats } = matched;
-      const info = {
+      const args = {
         path: pathname,
         params,
         query: parseQueryString(location.search),
         splats,
         route,
       };
-      yield put(updatePathInfo(info));
-      yield call(action, info);
+      yield put(updatePathInfo(args));
+      try {
+        yield call(action, args);
+      } finally {
+        if (typeof cancel === 'function' && (yield cancelled())) {
+          yield call(cancel);
+        }
+      }
     } else {
       console.error(`No matched route: ${pathname} (original='${location.pathname}', offset='${offset}')`);
     }
@@ -76,7 +82,7 @@ function preprocess(routes) {
   return routes;
 }
 
-function* handleLocationChange({ history, routes, initial }) {
+function* handleLocationChange({ history, routes, initial, cancel }) {
   // Use initial path as offset
   const offset = normOffset(history.location.pathname);
 
@@ -84,7 +90,7 @@ function* handleLocationChange({ history, routes, initial }) {
   yield put(init({ page: initial, offset }));
 
   const location = createLocationChannel(history);
-  const handler = createHandler(prepareMatcher(preprocess(routes)), offset);
+  const handler = createHandler(prepareMatcher(preprocess(routes)), offset, cancel);
 
   // Initialize with the current location
   yield call(handler, { location: history.location });

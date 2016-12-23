@@ -1,7 +1,8 @@
-import { put, call, fork } from 'redux-saga/effects';
+import { put, call, fork, cancelled } from 'redux-saga/effects';
 import { createBrowserHistory, actions } from '../../../src/index';
 import router from '../../../src/saga';
 import { loadPosts, loadPost } from './posts';
+import { cancelFetchPosts } from '../actions';
 
 import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
@@ -21,7 +22,11 @@ const routes = {
   '/about': About,
 };
 
+function* cancel() {
+  yield put(cancelFetchPosts());
+}
+
 export default function* routesSaga() {
   const history = createBrowserHistory();
-  yield fork(router, { history, routes, initial: Loading });
+  yield fork(router, { history, routes, initial: Loading, cancel });
 }

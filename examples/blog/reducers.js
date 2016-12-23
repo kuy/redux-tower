@@ -2,7 +2,7 @@
 
 import type { Action } from './actions';
 import { combineReducers } from 'redux';
-import { REQUEST_FETCH_POSTS, SUCCESS_FETCH_POSTS, FAILURE_FETCH_POSTS } from './actions';
+import { REQUEST_FETCH_POSTS, SUCCESS_FETCH_POSTS, FAILURE_FETCH_POSTS, CANCEL_FETCH_POSTS } from './actions';
 import Loading from './pages/loading';
 import router from '../../src/reducer';
 import type { PostId, Post } from './api';
@@ -45,6 +45,9 @@ const handlers = {
     },
     FAILURE_FETCH_POSTS: state => {
       return { ...state, status: 'ready', error: true };
+    },
+    CANCEL_FETCH_POSTS: state => {
+      return { ...state, status: 'ready', error: false };
     },
   },
 };
