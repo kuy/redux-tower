@@ -1,13 +1,22 @@
-import { put, call, fork, cancelled } from 'redux-saga/effects';
+// @flow
+
+import { put, call, fork, take, cancelled } from 'redux-saga/effects';
 import { createBrowserHistory, actions } from '../../../src/index';
 import router from '../../../src/saga';
 import { loadPosts, loadPost } from './posts';
-import { cancelFetchPosts } from '../actions';
+import {
+  SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS,
+  cancelFetchPosts
+} from '../actions';
 
 import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
 import About from '../pages/about';
 import Loading from '../pages/loading';
+import AdminPostsIndex from '../pages/admin/posts/index';
+import AdminPostsEdit from '../pages/admin/posts/edit';
+
+import type { IOEffect } from 'redux-saga/effects';
 
 const routes = {
   '/': '/posts',
@@ -19,6 +28,20 @@ const routes = {
     yield call(loadPost, id);
     yield put(actions.changeComponent(PostsShow));
   },
+  '/admin/posts': function* adminPostsIndexPage({ query }) {
+    query.limit = 10;
+    yield call(loadPosts, query);
+    yield put(actions.changeComponent(AdminPostsIndex));
+  },
+  '/admin/posts/:id/edit': function* adminPostsEditPage({ params: { id } }) {
+    yield call(loadPost, id);
+    yield put(actions.changeComponent(AdminPostsEdit));
+  },
+  '/admin/posts/:id/update': function* adminPostsUpdateAction({ params: { id } }) {
+    // TODO: Routing based on the result
+    yield take([SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS]);
+    yield put(actions.replace(`/admin/posts`));
+  },
   '/about': About,
 };
 
@@ -26,7 +49,7 @@ function* cancel() {
   yield put(cancelFetchPosts());
 }
 
-export default function* routesSaga() {
+export default function* routesSaga(): Generator<IOEffect,void,*> {
   const history = createBrowserHistory();
   yield fork(router, { history, routes, initial: Loading, cancel });
 }

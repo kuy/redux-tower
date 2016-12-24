@@ -63,8 +63,14 @@ function toObj(pairs) {
   return pairs.reduce((p, [k, v]) => ({ ...p, [k]: v }), {});
 }
 
+export type QueryParams = {
+  q?: string,
+  page?: number,
+  limit?: number,
+};
+
 export const posts = {
-  all({ q, page = 1, limit = 2 }: { q?: string, page?: number, limit?: number } = {}) {
+  all({ q, page = 1, limit = 2 }: QueryParams = {}) {
     const offset = (page - 1) * limit;
 
     // Enumerate id of condidate pages
@@ -96,5 +102,9 @@ export const posts = {
         entities: { [id]: POSTS.entities[id] }
       } 
     });
+  },
+  update({ id, title, body }: Post) {
+    POSTS.entities[id] = { id, title, body };
+    return posts.one(id);
   },
 };

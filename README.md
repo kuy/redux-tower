@@ -48,7 +48,7 @@ You can also use [Redux DevTools extension](https://github.com/zalmoxisus/redux-
 
 ### Try in local
 
-Clone this repository and run following npm scripts.
+Clone this repository and run following npm commands.
 
 ```
 npm install

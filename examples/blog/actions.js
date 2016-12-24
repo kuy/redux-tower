@@ -5,6 +5,7 @@ import type { ActionCreator } from 'redux';
 
 export type ActionType =
   | 'REQUEST_FETCH_POSTS' | 'SUCCESS_FETCH_POSTS' | 'FAILURE_FETCH_POSTS' | 'CANCEL_FETCH_POSTS'
+  | 'REQUEST_STORE_POSTS' | 'SUCCESS_STORE_POSTS' | 'FAILURE_STORE_POSTS' | 'CANCEL_STORE_POSTS'
   | 'REQUEST_SEARCH';
 
 export type Action = {
@@ -21,6 +22,15 @@ export const requestFetchPosts: ActionCreator = createAction(REQUEST_FETCH_POSTS
 export const successFetchPosts: ActionCreator = createAction(SUCCESS_FETCH_POSTS);
 export const failureFetchPosts: ActionCreator = createAction(FAILURE_FETCH_POSTS);
 export const cancelFetchPosts: ActionCreator = createAction(CANCEL_FETCH_POSTS);
+
+export const REQUEST_STORE_POSTS: ActionType = 'REQUEST_STORE_POSTS';
+export const SUCCESS_STORE_POSTS: ActionType = 'SUCCESS_STORE_POSTS';
+export const FAILURE_STORE_POSTS: ActionType = 'FAILURE_STORE_POSTS';
+export const CANCEL_STORE_POSTS: ActionType = 'CANCEL_STORE_POSTS';
+export const requestStorePosts: ActionCreator = createAction(REQUEST_STORE_POSTS);
+export const successStorePosts: ActionCreator = createAction(SUCCESS_STORE_POSTS);
+export const failureStorePosts: ActionCreator = createAction(FAILURE_STORE_POSTS);
+export const cancelStorePosts: ActionCreator = createAction(CANCEL_STORE_POSTS);
 
 export const REQUEST_SEARCH = 'REQUEST_SEARCH';
 export const requestSearch = createAction(REQUEST_SEARCH);
