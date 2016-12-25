@@ -6,6 +6,7 @@ import router from '../../../src/saga';
 import { loadPosts, loadPost } from './posts';
 import {
   SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS,
+  SUCCESS_LOGIN, FAILURE_LOGIN,
   cancelFetchPosts
 } from '../actions';
 
@@ -13,6 +14,7 @@ import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
 import About from '../pages/about';
 import Loading from '../pages/loading';
+import AdminLogin from '../pages/admin/login';
 import AdminPostsIndex from '../pages/admin/posts/index';
 import AdminPostsEdit from '../pages/admin/posts/edit';
 
@@ -28,6 +30,16 @@ const routes = {
     yield call(loadPost, id);
     yield put(actions.changeComponent(PostsShow));
   },
+  '/admin/login': AdminLogin,
+  '/admin/login/processing': function* adminLoginProcessingAction() {
+    const { type } = yield take([SUCCESS_LOGIN, FAILURE_LOGIN]);
+    if (type === SUCCESS_LOGIN) {
+      yield put(actions.changeComponent(Loading));
+      yield put(actions.replace(`/admin/posts`));
+    } else {
+      yield put(actions.replace(`/admin/login`));
+    }
+  },
   '/admin/posts': function* adminPostsIndexPage({ query }) {
     query.limit = 10;
     yield call(loadPosts, query);
@@ -37,7 +49,7 @@ const routes = {
     yield call(loadPost, id);
     yield put(actions.changeComponent(AdminPostsEdit));
   },
-  '/admin/posts/:id/update': function* adminPostsUpdateAction({ params: { id } }) {
+  '/admin/posts/:id/update': function* adminPostsUpdateAction() {
     // TODO: Routing based on the result
     yield take([SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS]);
     yield put(actions.replace(`/admin/posts`));

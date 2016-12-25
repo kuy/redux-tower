@@ -2,13 +2,18 @@
 
 import type { Action } from './actions';
 import { combineReducers } from 'redux';
-import { REQUEST_FETCH_POSTS, SUCCESS_FETCH_POSTS, FAILURE_FETCH_POSTS, CANCEL_FETCH_POSTS } from './actions';
+import {
+  REQUEST_FETCH_POSTS, SUCCESS_FETCH_POSTS, FAILURE_FETCH_POSTS, CANCEL_FETCH_POSTS,
+  REQUEST_LOGIN, SUCCESS_LOGIN, FAILURE_LOGIN,
+} from './actions';
 import Loading from './pages/loading';
 import router from '../../src/reducer';
 import type { PostId, Post } from './api';
 
-type AppState = {};
-type PostsState = { list: Array<PostId>, entities: { [PostId]: Post } };
+type StatusType = 'ready' | 'working';
+type StatusState = { status: StatusType, error: boolean };
+type AppState = StatusState & { login: ?string };
+type PostsState = StatusState & { list: Array<PostId>, entities: { [PostId]: Post } };
 
 export type State = {
   app: AppState,
@@ -16,7 +21,11 @@ export type State = {
 };
 
 const initial: State = {
-  app: {},
+  app: {
+    login: undefined,
+    status: 'ready',
+    error: false,
+  },
   posts: {
     list: [],
     entities: {},
@@ -25,14 +34,26 @@ const initial: State = {
   },
 };
 
-const handlers = {
-  app: {},
-  posts: {
-    REQUEST_FETCH_POSTS: (state: PostsState): PostsState => {
-      return { ...state, status: 'working', error: false };
-    },
-    SUCCESS_FETCH_POSTS: (state: PostsState, { payload: { list, entities } }: Action): PostsState => {
-      return { 
+function app(state: AppState = initial.app, { type, payload }: Action): AppState {
+  switch (type) {
+    case REQUEST_LOGIN:
+      return { ...state, status: 'working' };
+    case SUCCESS_LOGIN:
+      return { ...state, status: 'ready', error: false };
+    case FAILURE_LOGIN:
+      return { ...state, status: 'ready', error: true };
+  }
+
+  return state;
+}
+
+function posts(state: PostsState = initial.posts, { type, payload }: Action): PostsState {
+  switch (type) {
+    case REQUEST_FETCH_POSTS:
+      return { ...state, status: 'working' };
+    case SUCCESS_FETCH_POSTS:
+      const { list, entities } = payload;
+      return {
         ...state,
         status: 'ready',
         error: false,
@@ -42,26 +63,13 @@ const handlers = {
           ...entities,
         },
       };
-    },
-    FAILURE_FETCH_POSTS: state => {
+    case FAILURE_FETCH_POSTS:
       return { ...state, status: 'ready', error: true };
-    },
-    CANCEL_FETCH_POSTS: state => {
+    case CANCEL_FETCH_POSTS:
       return { ...state, status: 'ready', error: false };
-    },
-  },
-};
+  }
 
-function app(state: AppState = initial.app, action: Action): AppState {
-  const handler = handlers.app[action.type];
-  if (!handler) return state;
-  return handler(state, action);
-}
-
-function posts(state: PostsState = initial.posts, action: Action): PostsState {
-  const handler = handlers.posts[action.type];
-  if (!handler) return state;
-  return handler(state, action);
+  return state;
 }
 
 export default combineReducers(

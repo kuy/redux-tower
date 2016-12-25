@@ -43,16 +43,22 @@ const POSTS = {
   },
 };
 
-export type ResponseData = {
+type PostsResponse = {
   data: {
     list: Array<PostId>,
     entities: { [PostId]: Post },
   }
 };
 
-function response(data): Promise<ResponseData> {
+type AuthResponse =
+  | { data: { username: string } }
+  | { error: any };
+
+type Response = PostsResponse | AuthResponse;
+
+function response(data): Promise<Response> {
   return new Promise(resolve => {
-    // Simulate communication delay
+    // Fake delay :)
     setTimeout(() => {
       resolve(data);
     }, 1500);
@@ -106,5 +112,20 @@ export const posts = {
   update({ id, title, body }: Post) {
     POSTS.entities[id] = { id, title, body };
     return posts.one(id);
+  },
+};
+
+type Credential = {
+  username: string,
+  password: string,
+};
+
+export const auth = {
+  login({ username, password }: Credential) {
+    if (username === 'admin' && password === 'tower') {
+      return response({ data: { username } });
+    } else {
+      return response({ error: 'Invalid username or password' });
+    }
   },
 };

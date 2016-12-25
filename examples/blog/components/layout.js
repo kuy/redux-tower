@@ -25,6 +25,7 @@ class Layout extends Component {
             <Menu.Item><Link to='/posts'>Posts</Link></Menu.Item>
             <Menu.Item><Link to='/about'>About</Link></Menu.Item>
             <Menu.Menu position='right'>
+              <Menu.Item><Link to='/admin/login'>Login</Link></Menu.Item>
               <Menu.Item><Link to='/admin/posts'>Admin</Link></Menu.Item>
               <Menu.Item><Link external target='_blank' to='https://github.com/kuy/redux-saga-tower'>GitHub</Link></Menu.Item>
               <Menu.Item>
