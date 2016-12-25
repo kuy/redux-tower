@@ -64,18 +64,54 @@ function createRouteAction(Component) {
   return action[name];
 }
 
-function preprocess(routes) {
+// XXX: Destructive process
+export function preprocess(routes) {
+  // 1. Resolve React component
   for (const path of Object.keys(routes)) {
     const value = routes[path];
-
-    // Resolve redirect/alias
-    if (typeof value === 'string') {
-      routes[path] = routes[value];
-    }
-
-    // Resolve React component
     if (value.prototype && typeof value.prototype.isReactComponent !== 'undefined') {
       routes[path] = createRouteAction(value);
+    }
+  }
+
+  // 2. Resolve redirect/alias with circular reference detector
+  const resolve = (() => {
+    const memo = [];
+
+    function isCircular() {
+      if (3 <= memo.length) {
+        const [p3, p2, p1] = memo.slice(0, 3);
+        if (p1 === p2 && p2 === p3) return true;
+      }
+      if (3 <= memo.length) {
+        const [p3, p2, p1] = memo.slice(0, 3);
+        if (p1 === p3) return true;
+      }
+      return false;
+    }
+
+    return function resolve(path) {
+      // Check circular references
+      memo.unshift(path);
+      if (isCircular()) {
+        // console.log(`${path} in ${memo.join(' <- ')}`);
+        throw new Error(`Detected circular reference in '${path}'`);
+      }
+
+      // Resolve aliases
+      const dest = routes[path];
+      if (typeof dest !== 'string') {
+        return dest;
+      }
+
+      return resolve(dest);
+    };
+  })();
+
+  for (const path of Object.keys(routes)) {
+    const value = routes[path];
+    if (typeof value === 'string') {
+      routes[path] = resolve(value);
     }
   }
 
