@@ -13,8 +13,10 @@ export function normOffset(offset) {
 
 // offset: normalized offset
 export function removeOffset(pathname, offset) {
-  if (pathname.indexOf(offset) === 0) {
+  if (pathname.indexOf(offset + '/') === 0) {
     pathname = pathname.replace(offset, '');
+  } else if (pathname === offset) {
+    pathname = '/';
   }
   return pathname;
 }
@@ -26,7 +28,7 @@ export function parseQueryString(search) {
   return qs.parse(search);
 }
 
-function upperFirst(word) {
+export function upperFirst(word) {
   if (typeof word !== 'string' || word.length === 0) return word;
   return word[0].toUpperCase() + word.slice(1).toLowerCase();
 }
