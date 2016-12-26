@@ -1,14 +1,14 @@
 {
-  "name": "redux-saga-tower",
+  "name": "redux-tower",
   "description": "Saga powered routing engine for Redux app.",
-  "homepage": "https://github.com/kuy/redux-saga-tower",
+  "homepage": "https://github.com/kuy/redux-tower",
   "authors": [
     "Yuki Kodama <endflow.net@gmail.com>"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kuy/redux-saga-tower.git"
+    "url": "https://github.com/kuy/redux-tower.git"
   },
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --progress --content-base examples/",

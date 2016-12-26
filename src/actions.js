@@ -1,4 +1,4 @@
-const PREFIX = '@@redux-saga-tower/';
+const PREFIX = '@@redux-tower/';
 
 export const unprefix = type => type.replace(PREFIX, '');
 

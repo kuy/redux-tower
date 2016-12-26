@@ -1,8 +1,8 @@
-# redux-saga-tower
+# redux-tower
 
 [Saga](https://github.com/yelouafi/redux-saga) powered routing engine for [Redux](http://redux.js.org/) apps.
 
-redux-saga-tower provides a way to fully control client-side routing with its related side effects
+redux-tower provides a way to fully control client-side routing with its related side effects
 such as data fetching, user authentication, fancy animations.
 
 **NOTICE: This package is ACTIVELY under development.  
@@ -12,7 +12,7 @@ API (both public and internal) may change suddenly. Do NOT use in production.**
 ## Installation
 
 ```
-npm install --save redux-saga-tower
+npm install --save redux-tower
 ```
 
 
@@ -40,8 +40,8 @@ because both react-router and redux-saga-router are working separately. I feel i
 
 ### Online Demo
 
-+ **[Minimum](https://github.com/kuy/redux-saga-tower/tree/master/examples/minimum)**: [Demo](http://kuy.github.io/redux-saga-tower/minimum/) | Minimum usage example with Hash based history.
-+ **[Blog](https://github.com/kuy/redux-saga-tower/tree/master/examples/blog)**: [Demo](http://kuy.github.io/redux-saga-tower/blog/) | Real World Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
++ **[Minimum](https://github.com/kuy/redux-tower/tree/master/examples/minimum)**: [Demo](http://kuy.github.io/redux-tower/minimum/) | Minimum usage example with Hash based history.
++ **[Blog](https://github.com/kuy/redux-tower/tree/master/examples/blog)**: [Demo](http://kuy.github.io/redux-tower/blog/) | Real World Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
 
 [redux-logger](https://github.com/evgenyrodionov/redux-logger) is enabled. Open the JavaScript console of developer tools in your browser.
 You can also use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension) to see the store and the actions being fired.
@@ -129,7 +129,7 @@ document.getElementById('container'));
 
 ## API / Building Blocks
 
-redux-saga-tower consists of several different kinds of elements/components.
+redux-tower consists of several different kinds of elements/components.
 In this section, I'd like to introduce them step by step and how to integrate with your Redux application.
 
 ### Routes
@@ -140,7 +140,7 @@ The URL pattern is a plain string, but is able to capture a part of URL and capt
 You can write a route action includes async control flows and interactions with Redux naturally thanks to redux-saga.
 
 ```js
-import { actions } from 'redux-saga-tower';
+import { actions } from 'redux-tower';
 import Home from '../path/to/home';
 
 const routes = {
@@ -178,14 +178,14 @@ const routes = {
 
 ### History
 
-redux-saga-tower is built on [history](https://www.npmjs.com/package/history) package so that you can choose a strategy from Hash based or History API.
+redux-tower is built on [history](https://www.npmjs.com/package/history) package so that you can choose a strategy from Hash based or History API.
 
 ```js
 // History API
-import { createBrowserHistory as createHistory } from 'redux-saga-tower';
+import { createBrowserHistory as createHistory } from 'redux-tower';
 
 // Or Hash based
-import { createHashHistory as createHistory } from 'redux-saga-tower';
+import { createHashHistory as createHistory } from 'redux-tower';
 
 // ...
 
@@ -208,7 +208,7 @@ Don't forget to pass the option when you fork. Here is a list of options.
 * cancel: [Optional] A saga, which is called when a running route action was cancelled by other route actions.
 
 ```js
-import { saga as router } from 'redux-saga-tower';
+import { saga as router } from 'redux-tower';
 
 // ...
 
@@ -229,7 +229,7 @@ A reducer is used to expose the location data to Redux's store.
 + splats: Array. *[WIP]*
 
 ```js
-import { reducer as router } from 'redux-saga-tower';
+import { reducer as router } from 'redux-tower';
 
 // ...
 
@@ -248,7 +248,7 @@ I'm happy to hear feature requests and merge your PRs if you feel it doesn't sat
 A simple component switcher, which is connected with Redux.
 
 ```js
-import { Router } from 'redux-saga-tower/react';
+import { Router } from 'redux-tower/react';
 
 // ...
 
@@ -264,7 +264,7 @@ document.getElementById('container'));
 `<Link>` component helps you to put a link in your Redux application.
 
 ```js
-import { Link } from 'redux-saga-tower/react';
+import { Link } from 'redux-tower/react';
 
 // ...
 
@@ -354,7 +354,7 @@ Yuki Kodama / [@kuy](https://twitter.com/kuy)
 
 ## Acknowledgment
 
-redux-saga-tower has inspired by [redux-saga-router](https://github.com/jfairbank/redux-saga-router).
+redux-tower has inspired by [redux-saga-router](https://github.com/jfairbank/redux-saga-router).
 Big thanks to [@jfairbank](https://github.com/jfairbank).
 
 
