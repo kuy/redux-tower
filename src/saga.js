@@ -64,21 +64,11 @@ function createRouteAction(Component) {
   return action[name];
 }
 
-// XXX: Destructive process
-export function preprocess(routes) {
-  // 1. Resolve React component
-  for (const path of Object.keys(routes)) {
-    const value = routes[path];
-    if (value.prototype && typeof value.prototype.isReactComponent !== 'undefined') {
-      routes[path] = createRouteAction(value);
-    }
-  }
-
-  // 2. Resolve redirect/alias with circular reference detector
-  const resolve = (() => {
+function createAliasResolver(routes) {
+  return (() => {
+    // TODO: Poor implementation :(
     const memo = [];
-
-    function isCircular() {
+    const isCircular = () => {
       if (3 <= memo.length) {
         const [p3, p2, p1] = memo.slice(0, 3);
         if (p1 === p2 && p2 === p3) return true;
@@ -88,9 +78,9 @@ export function preprocess(routes) {
         if (p1 === p3) return true;
       }
       return false;
-    }
+    };
 
-    return function resolve(path) {
+    return function innerResolve(path) {
       // Check circular references
       memo.unshift(path);
       if (isCircular()) {
@@ -104,11 +94,100 @@ export function preprocess(routes) {
         return dest;
       }
 
-      return resolve(dest);
+      return innerResolve(dest);
     };
   })();
+}
 
+// FIXME: Poor implementation :(
+export function resolveRelative(route, base) {
+  if (route.indexOf('/') === 0) {
+    return route;
+  }
+
+  if (route.indexOf('./') === 0) {
+    return base.join('') + route.slice(1);
+  }
+
+  // TODO: Throw exception if invalid traversal
+  base = [...base];
+
+  const segments = route.split('/');
+  while (0 < segments.length) {
+    const segment = segments[0]; // Peek first segment
+    if (segment === '..') {
+      segments.shift();
+      base.pop();
+    } else {
+      break;
+    }
+  }
+
+  return base.join('') + segments.map(s => '/' + s).join('');
+}
+
+function norm(path) {
+  if (path.lastIndexOf('/') === path.length - 1) {
+    path = path.slice(0, path.length - 1);
+  }
+  if (path === '') {
+    path = '/';
+  }
+  return path;
+}
+
+export function flatten(routes) {
+  const r = {};
+  const stack = [{
+    current: routes,
+    name: '',
+    backlog: Object.keys(routes).map(key => ([key, key])),
+  }];
+
+  while (0 < stack.length) {
+    const { current, backlog } = stack[stack.length - 1]; // Peek current backlog
+    while (0 < backlog.length) {
+      const [key, path] = backlog.shift();
+      let value = current[key];
+      if (typeof value === 'object') {
+        const base = stack.map(l => l.name).join('') + key;
+        stack.push({
+          current: value,
+          name: key,
+          backlog: Object.keys(value).map(key => ([key, base + key])),
+        });
+        break; // Digging
+      } else {
+        if (typeof value === 'string') {
+          value = norm(resolveRelative(value, stack.map(l => l.name)));
+        }
+        r[norm(path)] = value;
+      }
+    }
+
+    if (backlog === stack[stack.length - 1].backlog && backlog.length === 0) {
+      stack.pop(); // Pop only if not pushed a new one
+    }
+  }
+
+  return r;
+}
+
+export function preprocess(routes) {
+  // 1. Flatten nested and relative routes
+  routes = flatten(routes);
+
+  // 2. Replace React component with auto-generated route actions (sagas)
   for (const path of Object.keys(routes)) {
+    const value = routes[path];
+    if (value.prototype && typeof value.prototype.isReactComponent !== 'undefined') {
+      routes[path] = createRouteAction(value);
+    }
+  }
+
+  // 3. Resolve redirect/alias with detecting circular references
+  for (const path of Object.keys(routes)) {
+    const resolve = createAliasResolver(routes);
     const value = routes[path];
     if (typeof value === 'string') {
       routes[path] = resolve(value);

@@ -168,7 +168,7 @@ const routes = {
     yield put(actions.changeComponent(PostsShow));
   },
 
-  // Redirect to '/posts/:id' route with fixed parameter
+  // [WIP] Redirect to '/posts/:id' route with fixed parameter
   '/about': '/posts/2',
 
   // Assign React component directly (except Stateless Functional Components)
