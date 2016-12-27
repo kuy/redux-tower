@@ -14,7 +14,7 @@ import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
 import About from '../pages/about';
 import Loading from '../pages/loading';
-import AdminLogin from '../pages/admin/login';
+import UsersLogin from '../pages/users/login';
 import AdminPostsIndex from '../pages/admin/posts/index';
 import AdminPostsEdit from '../pages/admin/posts/edit';
 
@@ -32,17 +32,21 @@ const routes = {
       yield put(actions.changeComponent(PostsShow));
     },
   },
-  '/admin': {
-    '/login': AdminLogin,
-    '/login/processing': function* adminLoginProcessingAction() {
-      const { type } = yield take([SUCCESS_LOGIN, FAILURE_LOGIN]);
-      if (type === SUCCESS_LOGIN) {
-        yield put(actions.changeComponent(Loading));
-        yield put(actions.replace(`/admin/posts`));
-      } else {
-        yield put(actions.replace(`/admin/login`));
-      }
+  '/users': {
+    '/login': {
+      '/': UsersLogin,
+      '/processing': function* adminLoginProcessingAction() {
+        const { type } = yield take([SUCCESS_LOGIN, FAILURE_LOGIN]);
+        if (type === SUCCESS_LOGIN) {
+          yield put(actions.changeComponent(Loading));
+          yield put(actions.replace(`/admin/posts`));
+        } else {
+          yield put(actions.replace(`/users/login`));
+        }
+      },
     },
+  },
+  '/admin': {
     '/posts': {
       '/': function* adminPostsIndexPage({ query }) {
         query.limit = 10;

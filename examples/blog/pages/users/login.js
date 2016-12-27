@@ -4,7 +4,7 @@ import { Container, Form, Button, Message } from 'semantic-ui-react';
 import * as actions from '../../../../src/actions';
 import { requestLogin } from '../../actions';
 
-class AdminLogin extends Component {
+class UsersLogin extends Component {
   constructor(props) {
     super(props);
     this.state = { username: '', password: '' };
@@ -13,7 +13,7 @@ class AdminLogin extends Component {
   handleSubmit(e, { formData }) {
     e.preventDefault();
     this.props.dispatch(requestLogin(formData));
-    this.props.dispatch(actions.push(`/admin/login/processing`));
+    this.props.dispatch(actions.push(`/users/login/processing`));
   }
 
   handleChange(name, value) {
@@ -56,4 +56,4 @@ function select({ app }) {
   return { processing: status !== 'ready', error };
 }
 
-export default connect(select)(AdminLogin);
+export default connect(select)(UsersLogin);
