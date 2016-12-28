@@ -1,7 +1,10 @@
+import { put } from 'redux-saga/effects';
+import { changeComponent } from './actions';
+
 function createRouteAction(Component) {
   const name = `generated${Component.displayName || 'Unknown'}Component`;
   const action = {
-    [name]: function* () {
+    [name]: function* componentRouteAction() {
       yield put(changeComponent(Component));
     }
   };

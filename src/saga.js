@@ -33,7 +33,8 @@ function createHandler(matcher, offset, cancel) {
     const pathname = removeOffset(location.pathname, offset);
     const matched = matcher.match(pathname);
     if (matched) {
-      const { action, params, route, splats } = matched;
+      const { action: actions, params, route, splats } = matched;
+      console.log('actions', actions);
       const args = {
         path: pathname,
         params,
@@ -45,6 +46,7 @@ function createHandler(matcher, offset, cancel) {
       yield put(updatePathInfo(args));
 
       try {
+        const [enter, action, leave] = actions;
         yield call(action, args);
       } finally {
         if (typeof cancel === 'function' && (yield cancelled())) {

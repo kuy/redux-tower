@@ -46,8 +46,15 @@ const routes = {
       },
     },
   },
-  '/admin': {
-    '/posts': {
+  '/admin': [function* adminEnterHook() {
+    console.log('admin enter hook');
+    if (true) {
+      yield put(actions.replace(`/users/login`));
+    }
+  }, {
+    '/posts': [function* adminPostsEnterHook() {
+      console.log('admin posts enter hook');
+    }, {
       '/': function* adminPostsIndexPage({ query }) {
         query.limit = 10;
         yield call(loadPosts, query);
@@ -62,8 +69,12 @@ const routes = {
         yield take([SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS]);
         yield put(actions.replace(`/admin/posts`));
       },
-    },
-  },
+    }, function* adminPostsLeaveHook() {
+      console.log('admin posts leave hook');
+    }],
+  }, function* adminLeaveHook() {
+    console.log('admin leave hook');
+  }],
   '/about': About,
 };
 
