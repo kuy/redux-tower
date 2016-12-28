@@ -40,7 +40,9 @@ function createHandler(matcher, offset, cancel) {
         splats,
         route,
       };
+
       yield put(updatePathInfo(args));
+
       try {
         yield call(action, args);
       } finally {
@@ -109,13 +111,14 @@ export function resolveRelative(route, base) {
     return base.join('') + route.slice(1);
   }
 
-  // TODO: Throw exception if invalid traversal
   base = [...base];
 
   const segments = route.split('/');
   while (0 < segments.length) {
-    const segment = segments[0]; // Peek first segment
+    // Peek first segment
+    const segment = segments[0];
     if (segment === '..') {
+      // TODO: Throw exception if invalid traversal
       segments.shift();
       base.pop();
     } else {
@@ -126,7 +129,7 @@ export function resolveRelative(route, base) {
   return base.join('') + segments.map(s => '/' + s).join('');
 }
 
-function norm(path) {
+function normPath(path) {
   if (path.lastIndexOf('/') === path.length - 1) {
     path = path.slice(0, path.length - 1);
   }
@@ -145,7 +148,8 @@ export function flatten(routes) {
   }];
 
   while (0 < stack.length) {
-    const { current, backlog } = stack[stack.length - 1]; // Peek current backlog
+    // Peek current backlog
+    let { current, backlog } = stack[stack.length - 1];
     while (0 < backlog.length) {
       const [key, path] = backlog.shift();
       let value = current[key];
@@ -156,12 +160,13 @@ export function flatten(routes) {
           name: key,
           backlog: Object.keys(value).map(key => ([key, base + key])),
         });
-        break; // Digging
+        break; // Digging down
       } else {
         if (typeof value === 'string') {
-          value = norm(resolveRelative(value, stack.map(l => l.name)));
+          // Resolve relative routes
+          value = normPath(resolveRelative(value, stack.map(l => l.name)));
         }
-        r[norm(path)] = value;
+        r[normPath(path)] = value;
       }
     }
 
@@ -173,24 +178,69 @@ export function flatten(routes) {
   return r;
 }
 
+export function interpolate(routes, enterHooks = [], leaveHooks = []) {
+  const r = {};
+  for (const segment of Object.keys(routes)) {
+    const rval = routes[segment];
+    if (Array.isArray(rval)) {
+      let enter, action, leave;
+      switch (rval.length) {
+        case 1:
+          [action] = rval;
+          break;
+        case 2:
+          if (typeof rval[0] === 'object') {
+            [action, leave] = rval;
+          } else {
+            [enter, action] = rval;
+          }
+          break;
+        case 3:
+          [enter, action, leave] = rval;
+          break;
+        default:
+          throw new Error(`You can only use one hook each enter/leave in '${segment}': length=${rval.length}`);
+      }
+
+      if (typeof action !== 'object') {
+        throw new Error(`Hooks can be specified with nested routes in '${segment}'`);
+      }
+
+      // Normalize recursively
+      r[segment] = interpolate(
+        action,
+        [...enterHooks, enter].filter(h => !!h),
+        [leave, ...leaveHooks].filter(h => !!h)
+      );
+    } else {
+      // Interpolate hooks
+      r[segment] = [...enterHooks, rval, ...leaveHooks];
+    }
+  }
+  return r;
+}
+
 export function preprocess(routes) {
-  // 1. Flatten nested and relative routes
+  // 1. Interpolate hooks in nested routes
+  routes = interpolate(routes);
+
+  // 2. Flatten nested and resolve relative routes
   routes = flatten(routes);
 
-  // 2. Replace React component with auto-generated route actions (sagas)
-  for (const path of Object.keys(routes)) {
-    const value = routes[path];
+  // 3. Replace React component with auto-generated route actions (sagas)
+  for (const segment of Object.keys(routes)) {
+    const value = routes[segment];
     if (value.prototype && typeof value.prototype.isReactComponent !== 'undefined') {
-      routes[path] = createRouteAction(value);
+      routes[segment] = createRouteAction(value);
     }
   }
 
-  // 3. Resolve redirect/alias with detecting circular references
-  for (const path of Object.keys(routes)) {
+  // 4. Resolve redirect/alias with detecting circular references
+  for (const segment of Object.keys(routes)) {
     const resolve = createAliasResolver(routes);
-    const value = routes[path];
+    const value = routes[segment];
     if (typeof value === 'string') {
-      routes[path] = resolve(value);
+      routes[segment] = resolve(value);
     }
   }
 

@@ -76,10 +76,6 @@ test('preprocess - nested', t => {
   t.is(actual['/blog/posts/about'](), 'about');
 });
 
-test.skip('preprocess - leaving hook', t => {
-  // WIP
-});
-
 test('flatten', t => {
   let routes = {
     '/': 1,
@@ -138,4 +134,103 @@ test('resolveRelative', t => {
   // });
   // t.is(error.message, "");
   // t.is(saga.resolveRelative('../orange/../posts/2', ['', '/blog', '/posts']), '/blog/posts/2');
+});
+
+test('interpolate - basic', t => {
+  const action = function*(){};
+  let routes = {
+    '/a': ['ENTER-A', {
+      '/b': action,
+    }, 'LEAVE-A'],
+  };
+  t.deepEqual(saga.interpolate(routes), {
+    '/a': {
+      '/b': ['ENTER-A', action, 'LEAVE-A'],
+    },
+  });
+
+  routes = {
+    '/a': ['ENTER-A', {
+      '/b': action,
+    }],
+  };
+  t.deepEqual(saga.interpolate(routes), {
+    '/a': {
+      '/b': ['ENTER-A', action],
+    },
+  });
+
+  routes = {
+    '/a': [{
+      '/b': action,
+    }, 'LEAVE-A'],
+  };
+  t.deepEqual(saga.interpolate(routes), {
+    '/a': {
+      '/b': [action, 'LEAVE-A'],
+    },
+  });
+
+  routes = {
+    '/a': [{
+      '/b': action,
+    }],
+  };
+  t.deepEqual(saga.interpolate(routes), {
+    '/a': {
+      '/b': [action],
+    },
+  });
+
+  routes = {
+    '/a': ['ENTER-A', {
+      '/b': action,
+    }, 'LEAVE-A', 'MORE'],
+  };
+  let error = t.throws(() => {
+    saga.interpolate(routes);
+  });
+  t.is(error.message, "You can only use one hook each enter/leave in '/a': length=4");
+
+  routes = {
+    '/a': ['ENTER-A', action, 'LEAVE-A'],
+  };
+  error = t.throws(() => {
+    saga.interpolate(routes);
+  });
+  t.is(error.message, "Hooks can be specified with nested routes in '/a'");
+
+  routes = {
+    '/a': ['ENTER-A', 'EXTRA', {
+      '/b': action,
+    }],
+  };
+  error = t.throws(() => {
+    saga.interpolate(routes);
+  });
+  t.is(error.message, "Hooks can be specified with nested routes in '/a'");
+});
+
+test('interpolate - more nested', t => {
+  const action = function*(){};
+  let routes = {
+    '/': action,
+    '/a': ['ENTER-A', {
+      '/b': ['ENTER-B', {
+        '/c': [{
+          '/d': action,
+        }, 'LEAVE-C'],
+      }],
+    }, 'LEAVE-A'],
+  };
+  t.deepEqual(saga.interpolate(routes), {
+    '/': [action],
+    '/a': {
+      '/b': {
+        '/c': {
+          '/d': ['ENTER-A', 'ENTER-B', action, 'LEAVE-C', 'LEAVE-A']
+        },
+      },
+    },
+  });
 });
