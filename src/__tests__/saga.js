@@ -13,34 +13,12 @@ test('preprocess - flat', t => {
   };
   let actual = saga.preprocess(routes);
   t.is(actual['/top'], actual['/']);
-  t.true(typeof actual['/'].prototype.isReactComponent === 'undefined');
+  t.true(typeof actual['/'][1].prototype.isReactComponent === 'undefined');
   t.is(actual['/home'], actual['/']);
-
-  routes = {
-    '/circular': '/routing',
-    '/routing': '/circular',
-  };
-  let error = t.throws(() => {
-    saga.preprocess(routes);
-  });
-  t.is(error.message, "Detected circular reference in '/routing'");
-
-  // TODO: 3 or more circular references: /a -> /b -> /c -> /a
-
-  routes = {
-    '/me': '/me',
-  };
-  error = t.throws(() => {
-    saga.preprocess(routes);
-  });
-  t.is(error.message, "Detected circular reference in '/me'");
 });
 
-function fn(name) {
-  return () => name;
-}
-
 test('preprocess - nested', t => {
+  const fn = name => () => name;
   let routes = {
     '/': Page,
     '/blog': {
@@ -63,21 +41,44 @@ test('preprocess - nested', t => {
     '/about': fn('about'),
   };
   let actual = saga.preprocess(routes);
-  t.true(typeof actual['/'].prototype.isReactComponent === 'undefined');
-  console.log(actual['/news']);
-  t.is(actual['/news'](), 'posts-index');
-  t.is(actual['/about'](), 'about');
+  t.true(typeof actual['/'][1].prototype.isReactComponent === 'undefined');
+  t.is(actual['/news'][1](), 'posts-index');
+  t.is(actual['/about'][1](), 'about');
   t.is(actual['/blog'], actual['/']);
   t.is(actual['/blog/home'], actual['/']);
-  t.is(actual['/blog/latest'](), 'posts-index');
-  t.is(actual['/blog/posts'](), 'posts-index');
-  t.is(actual['/blog/posts/:id'](), 'posts-show');
-  t.is(actual['/blog/posts/new'](), 'posts-new');
-  t.is(actual['/blog/posts/about'](), 'about');
+  t.is(actual['/blog/latest'][1](), 'posts-index');
+  t.is(actual['/blog/posts'][1](), 'posts-index');
+  t.is(actual['/blog/posts/:id'][1](), 'posts-show');
+  t.is(actual['/blog/posts/new'][1](), 'posts-new');
+  t.is(actual['/blog/posts/about'][1](), 'about');
 });
 
-test('flatten', t => {
-  let routes = {
+test('flatten - basic', t => {
+  let routes = saga.interpolate({
+    '/': 1,
+    '/hoge': '/',
+  });
+  t.deepEqual(saga.flatten(routes), {
+    '/': [[], 1, []],
+    '/hoge': [[], '/', []],
+  });
+
+  routes = saga.interpolate({
+    '/': 1,
+    '/blog': {
+      '/': 2,
+      '/posts': '/',
+    },
+  });
+  t.deepEqual(saga.flatten(routes), {
+    '/': [[], 1, []],
+    '/blog': [[], 2, []],
+    '/blog/posts': [[], '/', []],
+  });
+});
+
+test('flatten - nested', t => {
+  let routes = saga.interpolate({
     '/': 1,
     '/hoge': 2,
     '/foo': {
@@ -98,16 +99,16 @@ test('flatten', t => {
       },
     },
     '/zzz': 4,
-  };
+  });
   t.deepEqual(saga.flatten(routes), {
-    '/': 1,
-    '/hoge': 2,
-    '/foo': '/',
-    '/foo/bar': '/foo',
-    '/pen/pineapple/apple/pen': '/watch/on/youtube',
-    '/pen/pineapple/orange': '/pen/pineapple/apple',
-    '/watch/on/youtube': 3,
-    '/zzz': 4,
+    '/': [[], 1, []],
+    '/hoge': [[], 2, []],
+    '/foo': [[], '/', []],
+    '/foo/bar': [[], '/foo', []],
+    '/pen/pineapple/apple/pen': [[], '/watch/on/youtube', []],
+    '/pen/pineapple/orange': [[], '/pen/pineapple/apple', []],
+    '/watch/on/youtube': [[], 3, []],
+    '/zzz': [[], 4, []],
   });
 });
 
@@ -137,37 +138,40 @@ test('resolveRelative', t => {
 });
 
 test('interpolate - basic', t => {
+  // Minimum
+  const enter = function*(){};
   const action = function*(){};
+  const leave = function*(){};
   let routes = {
-    '/a': ['ENTER-A', {
+    '/a': [enter, {
       '/b': action,
-    }, 'LEAVE-A'],
+    }, leave],
   };
   t.deepEqual(saga.interpolate(routes), {
     '/a': {
-      '/b': ['ENTER-A', action, 'LEAVE-A'],
+      '/b': [[enter], action, [leave]],
     },
   });
 
   routes = {
-    '/a': ['ENTER-A', {
+    '/a': [enter, {
       '/b': action,
     }],
   };
   t.deepEqual(saga.interpolate(routes), {
     '/a': {
-      '/b': ['ENTER-A', action],
+      '/b': [[enter], action, []],
     },
   });
 
   routes = {
     '/a': [{
       '/b': action,
-    }, 'LEAVE-A'],
+    }, leave],
   };
   t.deepEqual(saga.interpolate(routes), {
     '/a': {
-      '/b': [action, 'LEAVE-A'],
+      '/b': [[], action, [leave]],
     },
   });
 
@@ -178,14 +182,43 @@ test('interpolate - basic', t => {
   };
   t.deepEqual(saga.interpolate(routes), {
     '/a': {
-      '/b': [action],
+      '/b': [[], action, []],
     },
   });
 
+  // With redirection
   routes = {
-    '/a': ['ENTER-A', {
+    '/a': [enter, {
+      '/b': '/a',
+    }],
+  };
+  t.deepEqual(saga.interpolate(routes), {
+    '/a': {
+      '/b': [[enter], '/a', []],
+    },
+  });
+
+  // No hooks
+  routes = {
+    '/': action,
+    '/a': {
       '/b': action,
-    }, 'LEAVE-A', 'MORE'],
+    },
+    '/x': action,
+  };
+  t.deepEqual(saga.interpolate(routes), {
+    '/': [[], action, []],
+    '/a': {
+      '/b': [[], action, []],
+    },
+    '/x': [[], action, []],
+  });
+
+  // Check invalid routes
+  routes = {
+    '/a': [enter, {
+      '/b': action,
+    }, leave, leave],
   };
   let error = t.throws(() => {
     saga.interpolate(routes);
@@ -193,7 +226,7 @@ test('interpolate - basic', t => {
   t.is(error.message, "You can only use one hook each enter/leave in '/a': length=4");
 
   routes = {
-    '/a': ['ENTER-A', action, 'LEAVE-A'],
+    '/a': [enter, action, leave],
   };
   error = t.throws(() => {
     saga.interpolate(routes);
@@ -201,7 +234,7 @@ test('interpolate - basic', t => {
   t.is(error.message, "Hooks can be specified with nested routes in '/a'");
 
   routes = {
-    '/a': ['ENTER-A', 'EXTRA', {
+    '/a': [enter, enter, {
       '/b': action,
     }],
   };
@@ -221,16 +254,77 @@ test('interpolate - more nested', t => {
           '/d': action,
         }, 'LEAVE-C'],
       }],
+      '/x': action,
     }, 'LEAVE-A'],
   };
   t.deepEqual(saga.interpolate(routes), {
-    '/': [action],
+    '/': [[], action, []],
     '/a': {
       '/b': {
         '/c': {
-          '/d': ['ENTER-A', 'ENTER-B', action, 'LEAVE-C', 'LEAVE-A']
+          '/d': [['ENTER-A', 'ENTER-B'], action, ['LEAVE-C', 'LEAVE-A']]
         },
       },
+      '/x': [['ENTER-A'], action, ['LEAVE-A']],
     },
   });
+});
+
+test('resolve', t => {
+  let routes = {
+    '/': [[], 1, []],
+    '/a': [['ENTER-A'], '/a/b', ['LEAVE-B']],
+    '/a/b': [['ENTER-A', 'ENTER-B'], '/', ['LEAVE-B', 'LEAVE-A']],
+    '/a/b/c': [['ENTER-A', 'ENTER-B', 'ENTER-C'], '/a', ['LEAVE-C', 'LEAVE-B', 'LEAVE-A']],
+  };
+  saga.resolve(routes);
+  t.deepEqual(routes, {
+    '/': [[], 1, []],
+    '/a': [[], 1, []],
+    '/a/b': [[], 1, []],
+    '/a/b/c': [[], 1, []],
+  });
+
+  routes = {
+    '/': [[], 1, []],
+    '/a': [['ENTER-A'], 2, ['LEAVE-B']],
+    '/a/b': [['ENTER-A', 'ENTER-B'], '/a', ['LEAVE-B', 'LEAVE-A']],
+  };
+  saga.resolve(routes);
+  t.deepEqual(routes, {
+    '/': [[], 1, []],
+    '/a': [['ENTER-A'], 2, ['LEAVE-B']],
+    '/a/b': [['ENTER-A'], 2, ['LEAVE-B']],
+  });
+
+  // Check errors
+  routes = {
+    '/xxx': [[], '/xxx', []],
+  };
+  let error = t.throws(() => {
+    saga.resolve(routes);
+    saga.interpolate(routes);
+  });
+  t.is(error.message, "Potential for circular reference in '/xxx'");
+
+  routes = {
+    '/': [[], '/a', []],
+    '/a': [['ENTER-A'], '/', []],
+  };
+  error = t.throws(() => {
+    saga.resolve(routes);
+    saga.interpolate(routes);
+  });
+  t.is(error.message, "Potential for circular reference in '/'");
+
+  routes = {
+    '/': [[], '/a', []],
+    '/a': [[], '/a/b', []],
+    '/a/b': [[], '/', []],
+  };
+  error = t.throws(() => {
+    saga.resolve(routes);
+    saga.interpolate(routes);
+  });
+  t.is(error.message, "Potential for circular reference in '/'");
 });
