@@ -186,6 +186,18 @@ test('interpolate - basic', t => {
     },
   });
 
+  // Action with leave hook
+  routes = {
+    '/a': [enter, {
+      '/b': [action, leave],
+    }],
+  };
+  t.deepEqual(interpolate(routes), {
+    '/a': {
+      '/b': [[enter], action, [leave]],
+    },
+  });
+
   // With redirection
   routes = {
     '/a': [enter, {

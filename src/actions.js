@@ -1,6 +1,12 @@
 const PREFIX = '@@redux-tower/';
 
+export const INTERCEPTED = `${PREFIX}INTERCEPTED`;
+export const intercepted = action => ({ ...action, [INTERCEPTED]: true });
 export const unprefix = type => type.replace(PREFIX, '');
+
+export const isTowerAction = action => action && action.type && action.type.indexOf(PREFIX) === 0;
+export const isHistoryAction = action => action && action.type && HISTORY_ACTIONS.indexOf(action.type) !== -1;
+export const isIntercepted = action => action && !!action[INTERCEPTED];
 
 const createActionCreator = type => payload => ({ type, payload });
 
@@ -24,3 +30,5 @@ export const replace = createActionCreatorArgs(REPLACE);
 export const go = createActionCreatorArgs(GO);
 export const goBack = createActionCreatorArgs(GO_BACK);
 export const goForward = createActionCreatorArgs(GO_FORWARD);
+
+export const HISTORY_ACTIONS = [PUSH, REPLACE, GO, GO_BACK, GO_FORWARD];

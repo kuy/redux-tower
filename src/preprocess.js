@@ -38,7 +38,7 @@ export function interpolate(routes, enterHooks = [], leaveHooks = []) {
   const r = {};
   for (const segment of Object.keys(routes)) {
     let rval = routes[segment];
-    if (typeof rval === 'object') {
+    if (typeof rval === 'object') { // Array or Object
       if (!Array.isArray(rval)) {
         rval = [rval];
       }
@@ -49,6 +49,11 @@ export function interpolate(routes, enterHooks = [], leaveHooks = []) {
           [action] = rval;
           break;
         case 2:
+          if (typeof rval[0] !== 'object' && typeof rval[1] !== 'object') {
+            // Special pattern: route action with leave hook
+            r[segment] = [enterHooks, rval[0], [rval[1], ...leaveHooks]];
+            continue;
+          }
           if (typeof rval[0] === 'object') {
             [action, leave] = rval;
           } else {

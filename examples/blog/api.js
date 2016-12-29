@@ -61,7 +61,7 @@ function response(data): Promise<Response> {
     // Fake delay :)
     setTimeout(() => {
       resolve(data);
-    }, 1500);
+    }, 1250);
   });
 }
 
@@ -127,5 +127,8 @@ export const auth = {
     } else {
       return response({ error: 'Invalid username or password' });
     }
+  },
+  logout() {
+    return response({ data: true });
   },
 };

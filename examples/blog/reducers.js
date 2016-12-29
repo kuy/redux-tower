@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 import {
   REQUEST_FETCH_POSTS, SUCCESS_FETCH_POSTS, FAILURE_FETCH_POSTS, CANCEL_FETCH_POSTS,
   REQUEST_LOGIN, SUCCESS_LOGIN, FAILURE_LOGIN,
+  REQUEST_LOGOUT, SUCCESS_LOGOUT, FAILURE_LOGOUT,
 } from './actions';
 import { reducer as router } from '../../src/index';
 import type { Action } from './actions';
@@ -36,10 +37,17 @@ const initial: State = {
 function app(state: AppState = initial.app, { type, payload }: Action): AppState {
   switch (type) {
     case REQUEST_LOGIN:
-      return { ...state, status: 'working' };
+      return { ...state, login: undefined, status: 'working' };
     case SUCCESS_LOGIN:
-      return { ...state, status: 'ready', error: false };
+      return { ...state, login: payload.username, status: 'ready', error: false };
     case FAILURE_LOGIN:
+      return { ...state, login: undefined, status: 'ready', error: true };
+
+    case REQUEST_LOGOUT:
+      return { ...state, status: 'working' };
+    case SUCCESS_LOGOUT:
+      return { ...state, status: 'ready', error: false, login: undefined };
+    case FAILURE_LOGOUT:
       return { ...state, status: 'ready', error: true };
   }
 

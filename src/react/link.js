@@ -25,6 +25,11 @@ class Link extends Component {
   handleClick(e) {
     e.preventDefault();
 
+    const { onClick } = this.props;
+    if (typeof onClick === 'function') {
+      onClick(e);
+    }
+
     const href = getHref(this.props);
     this.props.dispatch(push(href));
   }
@@ -48,6 +53,7 @@ Link.propTypes = {
   external: PropTypes.bool,
   target: PropTypes.string,
   className: PropTypes.string,
+  onClick: PropTypes.func,
 };
 
 Link.defaultProps = {

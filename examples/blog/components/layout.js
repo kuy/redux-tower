@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Menu, Input, Icon, Header, Progress, Segment } from 'semantic-ui-react';
 import { actions } from '../../../src/index';
 import { Link } from '../../../src/react/index';
-import { requestSearch } from '../actions';
+import { requestSearch, requestLogout } from '../actions';
 
 class Layout extends Component {
   handleChange(e) {
@@ -11,8 +11,21 @@ class Layout extends Component {
     this.props.dispatch(requestSearch(action));
   }
 
+  handleLogout() {
+    console.log('handleLogout');
+    this.props.dispatch(requestLogout());
+  }
+
   render() {
-    const { loading, children } = this.props;
+    const { login, loading, children } = this.props;
+
+    let auth;
+    if (login) {
+      auth = <Menu.Item><Link to='/users/logout' onClick={this.handleLogout.bind(this)}>Logout</Link></Menu.Item>;
+    } else {
+      auth = <Menu.Item><Link to='/users/login'>Login</Link></Menu.Item>;
+    }
+
     return <div>
       <Segment>
         <Header as='h1' style={{ margin: 0 }}>
@@ -25,7 +38,7 @@ class Layout extends Component {
             <Menu.Item><Link to='/posts'>Posts</Link></Menu.Item>
             <Menu.Item><Link to='/about'>About</Link></Menu.Item>
             <Menu.Menu position='right'>
-              <Menu.Item><Link to='/users/login'>Login</Link></Menu.Item>
+              {auth}
               <Menu.Item><Link to='/admin/posts'>Admin</Link></Menu.Item>
               <Menu.Item><Link external target='_blank' to='https://github.com/kuy/redux-tower'>GitHub</Link></Menu.Item>
               <Menu.Item>
@@ -41,8 +54,8 @@ class Layout extends Component {
   }
 }
 
-function select({ posts: { status } }) {
-  return { loading: status === 'working' };
+function select({ app, posts: { status } }) {
+  return { login: !!app.login, loading: status === 'working' };
 }
 
 export default connect(select)(Layout);

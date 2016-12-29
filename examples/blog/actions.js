@@ -7,7 +7,8 @@ export type ActionType =
   | 'REQUEST_FETCH_POSTS' | 'SUCCESS_FETCH_POSTS' | 'FAILURE_FETCH_POSTS' | 'CANCEL_FETCH_POSTS'
   | 'REQUEST_STORE_POSTS' | 'SUCCESS_STORE_POSTS' | 'FAILURE_STORE_POSTS' | 'CANCEL_STORE_POSTS'
   | 'REQUEST_SEARCH'
-  | 'REQUEST_LOGIN' | 'SUCCESS_LOGIN' | 'FAILURE_LOGIN';
+  | 'REQUEST_LOGIN' | 'SUCCESS_LOGIN' | 'FAILURE_LOGIN'
+  | 'REQUEST_LOGOUT' | 'SUCCESS_LOGOUT' | 'FAILURE_LOGOUT';
 
 export type Action = {
   type: ActionType,
@@ -42,3 +43,10 @@ export const FAILURE_LOGIN: ActionType = 'FAILURE_LOGIN';
 export const requestLogin: ActionCreator = createAction(REQUEST_LOGIN);
 export const successLogin: ActionCreator = createAction(SUCCESS_LOGIN);
 export const failureLogin: ActionCreator = createAction(FAILURE_LOGIN);
+
+export const REQUEST_LOGOUT: ActionType = 'REQUEST_LOGOUT';
+export const SUCCESS_LOGOUT: ActionType = 'SUCCESS_LOGOUT';
+export const FAILURE_LOGOUT: ActionType = 'FAILURE_LOGOUT';
+export const requestLogout: ActionCreator = createAction(REQUEST_LOGOUT);
+export const successLogout: ActionCreator = createAction(SUCCESS_LOGOUT);
+export const failureLogout: ActionCreator = createAction(FAILURE_LOGOUT);
