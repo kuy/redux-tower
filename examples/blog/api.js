@@ -61,7 +61,7 @@ function response(data): Promise<Response> {
     // Fake delay :)
     setTimeout(() => {
       resolve(data);
-    }, 1250);
+    }, 2000);
   });
 }
 
