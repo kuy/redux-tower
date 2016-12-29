@@ -1,13 +1,12 @@
 // @flow
 
-import type { Action } from './actions';
 import { combineReducers } from 'redux';
 import {
   REQUEST_FETCH_POSTS, SUCCESS_FETCH_POSTS, FAILURE_FETCH_POSTS, CANCEL_FETCH_POSTS,
   REQUEST_LOGIN, SUCCESS_LOGIN, FAILURE_LOGIN,
 } from './actions';
-import Loading from './pages/loading';
-import router from '../../src/reducer';
+import { reducer as router } from '../../src/index';
+import type { Action } from './actions';
 import type { PostId, Post } from './api';
 
 type StatusType = 'ready' | 'working';

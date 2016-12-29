@@ -1,10 +1,7 @@
 // @flow
 
 import { take, fork, call, put } from 'redux-saga/effects';
-import {
-  requestLogin, successLogin, failureLogin,
-  REQUEST_LOGIN,
-} from '../actions';
+import { successLogin, failureLogin, REQUEST_LOGIN } from '../actions';
 import * as api from '../api';
 import type { IOEffect } from 'redux-saga/effects';
 

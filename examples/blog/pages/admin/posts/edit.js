@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Form, Button, Container } from 'semantic-ui-react';
 import { requestStorePosts } from '../../../actions';
-import * as actions from '../../../../../src/actions';
+import { actions } from '../../../../../src/index';
 
 class AdminPostsEdit extends Component {
   constructor(props) {

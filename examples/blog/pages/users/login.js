@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Container, Form, Button, Message } from 'semantic-ui-react';
-import * as actions from '../../../../src/actions';
+import { actions } from '../../../../src/index';
 import { requestLogin } from '../../actions';
 
 class UsersLogin extends Component {

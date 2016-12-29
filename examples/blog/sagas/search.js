@@ -1,7 +1,7 @@
 // @flow
 
-import { takeLatest, delay } from 'redux-saga';
-import { fork, call, put } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
+import { fork, call, put, takeLatest } from 'redux-saga/effects';
 import { REQUEST_SEARCH } from '../actions';
 import type { IOEffect } from 'redux-saga/effects';
 
