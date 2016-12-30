@@ -1,53 +1,21 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Header, Form, Button, Container } from 'semantic-ui-react';
+import { Header, Container } from 'semantic-ui-react';
 import { updateDirty, requestStorePosts } from '../../../actions';
 import { actions } from '../../../../../src/index';
+import Form from './form';
 
 class AdminPostsEdit extends Component {
-  constructor(props) {
-    super(props);
-    const { post: { id, title, body } } = this.props;
-    this.state = { id, title, body };
-    this.initial = { title, body };
-  }
-
-  handleChange(name, value) {
-    this.setState({ ...this.state, [name]: value }, () => {
-      this.props.dispatch(updateDirty(this.isDirty()));
-    });
-  }
-
-  handleSubmit(e, { formData: post }) {
-    e.preventDefault();
+  handleSubmit(post) {
     this.props.dispatch(requestStorePosts(post));
     this.props.dispatch(actions.push(`/admin/posts/${post.id}/update`));
   }
 
-  isDirty() {
-    return this.state.title !== this.initial.title || this.state.body !== this.initial.body;
-  }
-
   render() {
-    const { id, title, body } = this.state;
+    const { post: { id, title, body } } = this.props;
     return <Container>
       <Header as='h1'>Edit Post</Header>
-      <Form onSubmit={this.handleSubmit.bind(this)}>
-        <input name='id' type='hidden' value={id} />
-        <Form.Input
-          name='title'
-          value={title}
-          size='huge'
-          onChange={e => this.handleChange('title', e.target.value)}
-        />
-        <Form.TextArea
-          name='body'
-          value={body}
-          rows='16'
-          onChange={e => this.handleChange('body', e.target.value)}
-        />
-        <Button primary type='submit'>Update</Button>
-      </Form>
+      <Form id={id} title={title} body={body} onSubmit={this.handleSubmit.bind(this)} />
     </Container>;
   }
 }
