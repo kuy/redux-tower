@@ -1,7 +1,7 @@
 // @flow
 
 import { put, call, fork, take, select } from 'redux-saga/effects';
-import { createBrowserHistory, createMiddleware, saga as router, actions } from '../../../src/index';
+import { createBrowserHistory, createMiddleware, saga as router } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
 import {
   SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST,
@@ -27,11 +27,11 @@ const routes = {
   '/posts': {
     '/': function* postsIndexPage({ query }) {
       yield call(loadPosts, query);
-      yield put(actions.changeComponent(PostsIndex));
+      yield PostsIndex;
     },
     '/:id': function* postsShowPage({ params: { id } }) {
       yield call(loadPost, id);
-      yield put(actions.changeComponent(PostsShow));
+      yield PostsShow;
     },
   },
   '/users': {
@@ -40,18 +40,18 @@ const routes = {
       '/processing': function* usersLoginProcessingAction() {
         const { type } = yield take([SUCCESS_LOGIN, FAILURE_LOGIN]);
         if (type === SUCCESS_LOGIN) {
-          yield put(actions.changeComponent(Loading));
-          yield put(actions.replace('/admin/posts'));
+          yield Loading;
+          yield '/admin/posts';
         } else {
-          yield put(actions.replace('/users/login'));
+          yield '/users/login';
         }
       },
     },
     '/logout': function* usersLogoutAction() {
       const { type } = yield take([SUCCESS_LOGOUT, FAILURE_LOGOUT]);
       if (type === SUCCESS_LOGOUT) {
-        yield put(actions.changeComponent(Loading));
-        yield put(actions.replace('/'));
+        yield Loading;
+        yield '/';
       } else {
         // NOTE: Already logged-out?
       }
@@ -61,7 +61,7 @@ const routes = {
     console.log('admin enter hook');
     const { login } = yield select(state => state.app);
     if (!login) {
-      yield put(actions.replace('/users/login'));
+      yield '/users/login';
     }
   }, {
     '/posts': [function* adminPostsEnterHook() {
@@ -70,17 +70,17 @@ const routes = {
       '/': function* adminPostsIndexPage({ query }) {
         query.limit = 10;
         yield call(loadPosts, query);
-        yield put(actions.changeComponent(AdminPostsIndex));
+        yield AdminPostsIndex;
       },
       '/new': AdminPostsNew,
       '/create': function* adminPostsCreateAction() {
         // FIXME: Routing based on the result
         yield take([SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST]);
-        yield put(actions.replace('/admin/posts'));
+        yield '/admin/posts';
       },
       '/:id/edit': [function* adminPostsEditPage({ params: { id } }) {
         yield call(loadPost, id);
-        yield put(actions.changeComponent(AdminPostsEdit));
+        yield AdminPostsEdit;
       }, function* adminPostsEditLeaveHook() {
         console.log('admin posts edit leave hook');
         const { dirty } = yield select(state => state.posts);
@@ -90,12 +90,12 @@ const routes = {
         // FIXME: Routing based on the result
         yield take([SUCCESS_STORE_POST, FAILURE_STORE_POST, CANCEL_STORE_POST]);
         yield put(updateDirty(false));
-        yield put(actions.replace('/admin/posts'));
+        yield '/admin/posts';
       },
       '/:id/delete': function* adminPostsDeleteAction() {
         // FIXME: Routing based on the result
         yield take([SUCCESS_DELETE_POST, FAILURE_DELETE_POST, CANCEL_DELETE_POST]);
-        yield put(actions.replace('/admin/posts'));
+        yield '/admin/posts';
       },
     }, function* adminPostsLeaveHook() {
       console.log('admin posts leave hook');

@@ -1,5 +1,6 @@
 import { put } from 'redux-saga/effects';
 import { changeComponent } from './actions';
+import { isReactComponent } from './utils';
 
 function createRouteAction(Component) {
   const name = `generated${Component.displayName || 'Unknown'}Component`;
@@ -179,7 +180,7 @@ export default function preprocess(routes) {
   // 3. Replace React component with auto-generated route actions (sagas)
   for (const segment of Object.keys(routes)) {
     const [enter, action, leave] = routes[segment];
-    if (action.prototype && typeof action.prototype.isReactComponent !== 'undefined') {
+    if (isReactComponent(action)) {
       routes[segment] = [enter, createRouteAction(action), leave];
     }
   }

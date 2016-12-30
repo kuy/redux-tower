@@ -37,3 +37,7 @@ export function toCamelCase(SNAKE_CASE) {
   const words = SNAKE_CASE.split('_');
   return [words[0].toLowerCase(), ...words.slice(1).map(upperFirst)].join('');
 }
+
+export function isReactComponent(func) {
+  return func.prototype && typeof func.prototype.isReactComponent !== 'undefined';
+}

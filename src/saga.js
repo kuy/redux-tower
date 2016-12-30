@@ -2,10 +2,10 @@ import { eventChannel, buffers } from 'redux-saga';
 import { call, fork, put, select, take, race } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import {
-  intercepted, unprefix, init, updatePathInfo, push,
+  intercepted, unprefix, init, updatePathInfo, push, replace, changeComponent,
   PUSH, REPLACE, CHANGE_COMPONENT, HISTORY_ACTIONS
 } from './actions';
-import { parseQueryString, normOffset, removeOffset, toCamelCase } from './utils';
+import { parseQueryString, normOffset, removeOffset, toCamelCase, isReactComponent } from './utils';
 import preprocess from './preprocess';
 
 function createMatcher(routes) {
@@ -68,10 +68,20 @@ function* runHook(iterator) {
 function* runRouteAction(iterator, hooks, candidate, cancel, channels) {
   let ret;
   while (true) {
-    const { value: effect, done } = iterator.next(ret);
+    let { value: effect, done } = iterator.next(ret);
     if (done) break;
 
-    console.log('effect', effect, isBlockEffect(effect), isChangeComponent(effect));
+    console.log('effect', effect);
+
+    if (typeof effect === 'string') {
+      console.log('convert to replace');
+      effect = put(replace(effect));
+    }
+
+    if (isReactComponent(effect)) {
+      console.log('convert to changeComponent');
+      effect = put(changeComponent(effect));
+    }
 
     if (isChangeComponent(effect)) {
       // Run leaving hooks before changing component
