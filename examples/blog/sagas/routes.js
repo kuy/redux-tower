@@ -48,7 +48,6 @@ const routes = {
       },
     },
     '/logout': function* usersLogoutAction() {
-      console.log('/logout');
       const { type } = yield take([SUCCESS_LOGOUT, FAILURE_LOGOUT]);
       if (type === SUCCESS_LOGOUT) {
         yield put(actions.changeComponent(Loading));

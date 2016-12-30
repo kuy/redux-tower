@@ -12,7 +12,6 @@ class Layout extends Component {
   }
 
   handleLogout() {
-    console.log('handleLogout');
     this.props.dispatch(requestLogout());
   }
 
