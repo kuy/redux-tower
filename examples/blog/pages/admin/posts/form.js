@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form, Button, Container } from 'semantic-ui-react';
-import { updateDirty, requestStorePosts } from '../../../actions';
-import { actions } from '../../../../../src/index';
+import { Form, Button } from 'semantic-ui-react';
 
 export default class PostForm extends Component {
   constructor(props) {
@@ -14,7 +11,7 @@ export default class PostForm extends Component {
   handleChange(name, value) {
     this.setState({ ...this.state, [name]: value }, () => {
       if (!this.isNew()) {
-        this.props.dispatch(updateDirty(this.isDirty()));
+        this.props.onDirty(this.isDirty());
       }
     });
   }

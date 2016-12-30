@@ -45,9 +45,9 @@ function* createPost({ payload }: Action) {
 function* storePost({ payload }: Action) {
   const { data, error } = yield call(api.posts.update, payload);
   if (data && !error) {
-    yield put(successStorePosts(data));
+    yield put(successStorePost(data));
   } else {
-    yield put(failureStorePosts(error));
+    yield put(failureStorePost(error));
   }
 }
 

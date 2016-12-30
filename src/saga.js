@@ -63,6 +63,74 @@ function* runHook(iterator) {
   return true; // Not prevented
 }
 
+// hooks: Stored current leaving hooks
+// candidate: Candidate of leaving hooks in current route
+function* runRouteAction(iterator, hooks, candidate, cancel, channels) {
+  let ret;
+  while (true) {
+    const { value: effect, done } = iterator.next(ret);
+    if (done) break;
+
+    console.log('effect', effect, isBlockEffect(effect), isChangeComponent(effect));
+
+    if (isChangeComponent(effect)) {
+      // Run leaving hooks before changing component
+      let prevented = false;
+      console.log('run leaving hooks', hooks);
+      for (const hook of hooks) {
+        if ((yield call(runHook, hook())) === false) {
+          prevented = true;
+          break;
+        }
+      }
+
+      if (prevented) {
+        return {
+          prevented: true,     // Prevented in leaving hooks
+          hooks,               // Keep current leaving hooks
+          location: undefined, // No location change
+        };
+      }
+
+      // Set new leaving hooks
+      hooks = candidate;
+      console.log('new leaving hooks', hooks);
+    }
+
+    if (isBlockEffect(effect)) {
+      const { main, loc } = yield race({
+        main: effect,
+        loc: call(nextLocation, channels)
+      });
+
+      if (main) {
+        ret = main;
+      } else if (loc) {
+        console.log('cancel', loc);
+
+        // Run cancel hook. Ignore even if prevented
+        yield call(runHook, cancel());
+
+        return {
+          prevented: true, // Prevented
+          hooks: [],       // Clear leaving hooks
+          location: loc,   // New location
+        }; 
+      } else {
+        // XXX: NOOP...?
+      }
+    } else {
+      ret = yield effect;
+    }
+  }
+
+  return {
+    prevented: false,    // Not prevented
+    hooks,               // Keep or New
+    location: undefined, // No location change
+  }; 
+}
+
 function* nextLocation(channels) {
   let { browser, middleware } = yield takeFromChannels(channels), location;
   if (browser) {
@@ -95,10 +163,7 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
     const matched = matcher.match(pathname);
     if (!matched) {
       console.error(`No matched route: ${pathname} (original='${location.pathname}', offset='${offset}')`);
-
-      // Clear to prevent infinite loop
-      location = undefined;
-
+      location = undefined; // Clear to prevent infinite loop
       continue;
     }
 
@@ -119,81 +184,20 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
     // Clear for detecting location change while running action
     location = undefined;
 
-    let prevented = false;
-    const [enter, action, leave] = actions;
+    const [entering, action, leaving] = actions;
 
     // XXX: Thanks to the power of generator function, I can check that
     // these sagas may change a component or not without running them.
-    for (const fn of [...enter, action]) {
-      let ret, iterator;
-      if (fn === action) {
-        console.log('fn[action]', fn);
-        iterator = fn(args);
-      } else {
-        console.log('fn[enter]', fn);
-        iterator = fn();
+    for (const fn of [...entering, action]) {
+      const iterator = fn === action ? fn(args) : fn();
+      const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channels);
+      hooks = ret.hooks;
+      if (ret.location) {
+        location = ret.location;
       }
-
-      while (true) {
-        const { value: effect, done } = iterator.next(ret);
-        if (done) break;
-
-        console.log('effect', effect, isBlockEffect(effect), isChangeComponent(effect));
-
-        if (isChangeComponent(effect)) {
-          // Run leaving hooks before changing component
-          for (const hook of hooks) {
-            console.log('fn[leave]', hook);
-            if ((yield call(runHook, hook())) === false) {
-              // GOTO: Outermost while-loop
-              prevented = true;
-              break;
-            }
-          }
-
-          // GOTO: Outermost while-loop
-          if (prevented) break;
-
-          // Store new leaving hooks only
-          hooks = leave;
-        }
-
-        // GOTO: Outermost while-loop
-        if (prevented) break;
-
-        if (isBlockEffect(effect)) {
-          const { main, loc } = yield race({
-            main: effect,
-            loc: call(nextLocation, channels)
-          });
-
-          if (main) {
-            ret = main;
-          } else if (loc) {
-            console.log('cancel', loc);
-
-            // Run cancel hook
-            // No need to check return value
-            yield call(runHook, cancel());
-
-            // Location {is|will be} changed
-            // Use this location in next iteration
-            location = loc;
-
-            // Clear leaving hooks because routing is not finished
-            hooks = [];
-
-            break; // GOTO: Outermost while-loop
-          } else {
-            // NOOP...?
-          }
-        } else {
-          ret = yield effect;
-        }
+      if (ret.prevented === true) {
+        break; // GOTO: Outermost while-loop
       }
-
-      // GOTO: Outermost while-loop
-      if (location || prevented) break;
     }
   }
 }
