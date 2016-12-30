@@ -3,7 +3,7 @@ import { call, fork, put, select, take, race } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
 import {
   intercepted, unprefix, init, updatePathInfo, push,
-  PUSH, REPLACE, HISTORY_ACTIONS
+  PUSH, REPLACE, CHANGE_COMPONENT, HISTORY_ACTIONS
 } from './actions';
 import { parseQueryString, normOffset, removeOffset, toCamelCase } from './utils';
 import preprocess from './preprocess';
@@ -41,6 +41,10 @@ function isBlockEffect(effect) {
   return EFFECT_TYPES.map(type => !!effect[type]).reduce((p, c) => p || c, false);
 }
 
+function isChangeComponent(effect) {
+  return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === CHANGE_COMPONENT);
+}
+
 function* runHook(iterator) {
   let ret;
   while (true) {
@@ -59,21 +63,12 @@ function* runHook(iterator) {
   return true; // Not prevented
 }
 
-function* nextLocation(channels, hooks) {
+function* nextLocation(channels) {
   let { browser, middleware } = yield takeFromChannels(channels), location;
   if (browser) {
     location = browser.location;
     console.log('location[browser]', location.pathname, browser.action);
-    console.log('SKIP: leave hooks', hooks);
   } else {
-    // Run leave hooks
-    for (const hook of hooks) {
-      console.log('fn[leave]', hook);
-      if (!(yield call(runHook, hook()))) {
-        return; // Prevented
-      }
-    }
-
     const action = intercepted(middleware);
     yield put(action);
 
@@ -82,8 +77,7 @@ function* nextLocation(channels, hooks) {
     location = change.location;
     console.log('location[middleware]', location.pathname, change.action);
   }
-
-  return location; // Not prevented
+  return location;
 }
 
 // offset: normalized offset
@@ -94,8 +88,7 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
   let hooks = [], location;
   while (true) {
     if (!location) {
-      location = yield call(nextLocation, channels, hooks);
-      if (!location) continue; // Prevented by leave hooks
+      location = yield call(nextLocation, channels);
     }
 
     const pathname = removeOffset(location.pathname, offset);
@@ -122,9 +115,11 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
     // Clear for detecting location change while running action
     location = undefined;
 
+    let prevented = false;
     const [enter, action, leave] = actions;
-    hooks = leave;
 
+    // XXX: Thanks to the power of generator function, I can check that
+    // these sagas may change a component or not without running them.
     for (const fn of [...enter, action]) {
       let ret, iterator;
       if (fn === action) {
@@ -139,12 +134,35 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
         const { value: effect, done } = iterator.next(ret);
         if (done) break;
 
-        console.log('effect', effect, isBlockEffect(effect));
+        console.log('effect', effect, isBlockEffect(effect), isChangeComponent(effect));
+
+        if (isChangeComponent(effect)) {
+          // Run leaving hooks before changing component
+          for (const hook of hooks) {
+            console.log('fn[leave]', hook);
+            if ((yield call(runHook, hook())) === false) {
+              // GOTO: Outermost while-loop
+              prevented = true;
+              break;
+            }
+          }
+
+          // GOTO: Outermost while-loop
+          if (prevented) break;
+
+          // Store new leaving hooks only
+          hooks = leave;
+        }
+
+        // GOTO: Outermost while-loop
+        if (prevented) break;
+
         if (isBlockEffect(effect)) {
           const { main, loc } = yield race({
             main: effect,
-            loc: call(nextLocation, channels, []) // Passing leave hooks or not?
+            loc: call(nextLocation, channels)
           });
+
           if (main) {
             ret = main;
           } else if (loc) {
@@ -158,6 +176,9 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
             // Use this location in next iteration
             location = loc;
 
+            // Clear leaving hooks because routing is not finished
+            hooks = [];
+
             break; // GOTO: Outermost while-loop
           } else {
             // NOOP...?
@@ -168,7 +189,7 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
       }
 
       // GOTO: Outermost while-loop
-      if (location) break;
+      if (location || prevented) break;
     }
   }
 }

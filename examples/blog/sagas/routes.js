@@ -6,7 +6,7 @@ import { loadPosts, loadPost } from './posts';
 import {
   SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS,
   SUCCESS_LOGIN, FAILURE_LOGIN, SUCCESS_LOGOUT, FAILURE_LOGOUT,
-  cancelFetchPosts
+  cancelFetchPosts, updateDirty
 } from '../actions';
 
 import PostsIndex from '../pages/posts/index';
@@ -81,6 +81,7 @@ const routes = {
       '/:id/update': function* adminPostsUpdateAction() {
         // FIXME: Routing based on the result
         yield take([SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS]);
+        yield put(updateDirty(false));
         yield put(actions.replace('/admin/posts'));
       },
     }, function* adminPostsLeaveHook() {
