@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Form, Button, Container } from 'semantic-ui-react';
-import { requestStorePosts } from '../../../actions';
+import { updateDirty, requestStorePosts } from '../../../actions';
 import { actions } from '../../../../../src/index';
 
 class AdminPostsEdit extends Component {
@@ -9,22 +9,23 @@ class AdminPostsEdit extends Component {
     super(props);
     const { post: { id, title, body } } = this.props;
     this.state = { id, title, body };
+    this.initial = { title, body };
   }
 
-  handleChangeTitle(e) {
-    const title = e.target.value;
-    this.setState({ ...this.state, title });
-  }
-
-  handleChangeBody(e) {
-    const body = e.target.value;
-    this.setState({ ...this.state, body });
+  handleChange(name, value) {
+    this.setState({ ...this.state, [name]: value }, () => {
+      this.props.dispatch(updateDirty(this.isDirty()));
+    });
   }
 
   handleSubmit(e, { formData: post }) {
     e.preventDefault();
     this.props.dispatch(requestStorePosts(post));
     this.props.dispatch(actions.push(`/admin/posts/${post.id}/update`));
+  }
+
+  isDirty() {
+    return this.state.title !== this.initial.title || this.state.body !== this.initial.body;
   }
 
   render() {
@@ -36,13 +37,13 @@ class AdminPostsEdit extends Component {
           name='title'
           value={title}
           size='huge'
-          onChange={this.handleChangeTitle.bind(this)}
+          onChange={e => this.handleChange('title', e.target.value)}
         />
         <Form.TextArea
           name='body'
           value={body}
           rows='16'
-          onChange={this.handleChangeBody.bind(this)}
+          onChange={e => this.handleChange('body', e.target.value)}
         />
         <Button primary type='submit'>Save</Button>
       </Form>

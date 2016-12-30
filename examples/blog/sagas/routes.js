@@ -75,9 +75,8 @@ const routes = {
         yield put(actions.changeComponent(AdminPostsEdit));
       }, function* adminPostsEditLeaveHook() {
         console.log('admin posts edit leave hook');
-        if (true) {
-          yield false;
-        }
+        const { dirty } = yield select(state => state.posts);
+        if (dirty) yield false;
       }],
       '/:id/update': function* adminPostsUpdateAction() {
         // FIXME: Routing based on the result

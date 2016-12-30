@@ -5,6 +5,7 @@ import {
   REQUEST_FETCH_POSTS, SUCCESS_FETCH_POSTS, FAILURE_FETCH_POSTS, CANCEL_FETCH_POSTS,
   REQUEST_LOGIN, SUCCESS_LOGIN, FAILURE_LOGIN,
   REQUEST_LOGOUT, SUCCESS_LOGOUT, FAILURE_LOGOUT,
+  UPDATE_DIRTY,
 } from './actions';
 import { reducer as router } from '../../src/index';
 import type { Action } from './actions';
@@ -31,6 +32,7 @@ const initial: State = {
     entities: {},
     status: 'ready',
     error: false,
+    dirty: false,
   },
 };
 
@@ -74,6 +76,8 @@ function posts(state: PostsState = initial.posts, { type, payload }: Action): Po
       return { ...state, status: 'ready', error: true };
     case CANCEL_FETCH_POSTS:
       return { ...state, status: 'ready', error: false };
+    case UPDATE_DIRTY:
+      return { ...state, dirty: payload };
   }
 
   return state;

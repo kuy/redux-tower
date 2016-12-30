@@ -8,7 +8,8 @@ export type ActionType =
   | 'REQUEST_STORE_POSTS' | 'SUCCESS_STORE_POSTS' | 'FAILURE_STORE_POSTS' | 'CANCEL_STORE_POSTS'
   | 'REQUEST_SEARCH'
   | 'REQUEST_LOGIN' | 'SUCCESS_LOGIN' | 'FAILURE_LOGIN'
-  | 'REQUEST_LOGOUT' | 'SUCCESS_LOGOUT' | 'FAILURE_LOGOUT';
+  | 'REQUEST_LOGOUT' | 'SUCCESS_LOGOUT' | 'FAILURE_LOGOUT'
+  | 'UPDATE_DIRTY';
 
 export type Action = {
   type: ActionType,
@@ -50,3 +51,6 @@ export const FAILURE_LOGOUT: ActionType = 'FAILURE_LOGOUT';
 export const requestLogout: ActionCreator = createAction(REQUEST_LOGOUT);
 export const successLogout: ActionCreator = createAction(SUCCESS_LOGOUT);
 export const failureLogout: ActionCreator = createAction(FAILURE_LOGOUT);
+
+export const UPDATE_DIRTY = 'UPDATE_DIRTY';
+export const updateDirty = createAction(UPDATE_DIRTY);
