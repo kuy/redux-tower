@@ -95,6 +95,10 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
     const matched = matcher.match(pathname);
     if (!matched) {
       console.error(`No matched route: ${pathname} (original='${location.pathname}', offset='${offset}')`);
+
+      // Clear to prevent infinite loop
+      location = undefined;
+
       continue;
     }
 
