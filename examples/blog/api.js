@@ -113,6 +113,17 @@ export const posts = {
     POSTS.entities[id] = { id, title, body };
     return posts.one(id);
   },
+  delete(id: PostId) {
+    const post = POSTS.entities[id];
+    delete POSTS.entities[id];
+    POSTS.list = POSTS.list.filter(i => i !== id);
+    return response({
+      data: {
+        list: [id],
+        entities: { [id]: post }
+      } 
+    });
+  },
 };
 
 type Credential = {

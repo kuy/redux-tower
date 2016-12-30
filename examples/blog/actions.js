@@ -5,7 +5,7 @@ import type { ActionCreator } from 'redux';
 
 export type ActionType =
   | 'REQUEST_FETCH_POSTS' | 'SUCCESS_FETCH_POSTS' | 'FAILURE_FETCH_POSTS' | 'CANCEL_FETCH_POSTS'
-  | 'REQUEST_STORE_POSTS' | 'SUCCESS_STORE_POSTS' | 'FAILURE_STORE_POSTS' | 'CANCEL_STORE_POSTS'
+  | 'REQUEST_STORE_POST' | 'SUCCESS_STORE_POST' | 'FAILURE_STORE_POST' | 'CANCEL_STORE_POST'
   | 'REQUEST_SEARCH'
   | 'REQUEST_LOGIN' | 'SUCCESS_LOGIN' | 'FAILURE_LOGIN'
   | 'REQUEST_LOGOUT' | 'SUCCESS_LOGOUT' | 'FAILURE_LOGOUT'
@@ -26,14 +26,23 @@ export const successFetchPosts: ActionCreator = createAction(SUCCESS_FETCH_POSTS
 export const failureFetchPosts: ActionCreator = createAction(FAILURE_FETCH_POSTS);
 export const cancelFetchPosts: ActionCreator = createAction(CANCEL_FETCH_POSTS);
 
-export const REQUEST_STORE_POSTS: ActionType = 'REQUEST_STORE_POSTS';
-export const SUCCESS_STORE_POSTS: ActionType = 'SUCCESS_STORE_POSTS';
-export const FAILURE_STORE_POSTS: ActionType = 'FAILURE_STORE_POSTS';
-export const CANCEL_STORE_POSTS: ActionType = 'CANCEL_STORE_POSTS';
-export const requestStorePosts: ActionCreator = createAction(REQUEST_STORE_POSTS);
-export const successStorePosts: ActionCreator = createAction(SUCCESS_STORE_POSTS);
-export const failureStorePosts: ActionCreator = createAction(FAILURE_STORE_POSTS);
-export const cancelStorePosts: ActionCreator = createAction(CANCEL_STORE_POSTS);
+export const REQUEST_STORE_POST: ActionType = 'REQUEST_STORE_POST';
+export const SUCCESS_STORE_POST: ActionType = 'SUCCESS_STORE_POST';
+export const FAILURE_STORE_POST: ActionType = 'FAILURE_STORE_POST';
+export const CANCEL_STORE_POST: ActionType = 'CANCEL_STORE_POST';
+export const requestStorePost: ActionCreator = createAction(REQUEST_STORE_POST);
+export const successStorePost: ActionCreator = createAction(SUCCESS_STORE_POST);
+export const failureStorePost: ActionCreator = createAction(FAILURE_STORE_POST);
+export const cancelStorePost: ActionCreator = createAction(CANCEL_STORE_POST);
+
+export const REQUEST_DELETE_POST: ActionType = 'REQUEST_DELETE_POST';
+export const SUCCESS_DELETE_POST: ActionType = 'SUCCESS_DELETE_POST';
+export const FAILURE_DELETE_POST: ActionType = 'FAILURE_DELETE_POST';
+export const CANCEL_DELETE_POST: ActionType = 'CANCEL_DELETE_POST';
+export const requestDeletePost: ActionCreator = createAction(REQUEST_DELETE_POST);
+export const successDeletePost: ActionCreator = createAction(SUCCESS_DELETE_POST);
+export const failureDeletePost: ActionCreator = createAction(FAILURE_DELETE_POST);
+export const cancelDeletePost: ActionCreator = createAction(CANCEL_DELETE_POST);
 
 export const REQUEST_SEARCH = 'REQUEST_SEARCH';
 export const requestSearch = createAction(REQUEST_SEARCH);

@@ -4,7 +4,8 @@ import { put, call, fork, take, select } from 'redux-saga/effects';
 import { createBrowserHistory, createMiddleware, saga as router, actions } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
 import {
-  SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS,
+  SUCCESS_STORE_POST, FAILURE_STORE_POST, CANCEL_STORE_POST,
+  SUCCESS_DELETE_POST, FAILURE_DELETE_POST, CANCEL_DELETE_POST,
   SUCCESS_LOGIN, FAILURE_LOGIN, SUCCESS_LOGOUT, FAILURE_LOGOUT,
   cancelFetchPosts, updateDirty
 } from '../actions';
@@ -80,8 +81,13 @@ const routes = {
       }],
       '/:id/update': function* adminPostsUpdateAction() {
         // FIXME: Routing based on the result
-        yield take([SUCCESS_STORE_POSTS, FAILURE_STORE_POSTS, CANCEL_STORE_POSTS]);
+        yield take([SUCCESS_STORE_POST, FAILURE_STORE_POST, CANCEL_STORE_POST]);
         yield put(updateDirty(false));
+        yield put(actions.replace('/admin/posts'));
+      },
+      '/:id/delete': function* adminPostsDeleteAction() {
+        // FIXME: Routing based on the result
+        yield take([SUCCESS_DELETE_POST, FAILURE_DELETE_POST, CANCEL_DELETE_POST]);
         yield put(actions.replace('/admin/posts'));
       },
     }, function* adminPostsLeaveHook() {

@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { List, Container, Button } from 'semantic-ui-react';
+import { actions } from '../../../../../src/index';
 import { Link } from '../../../../../src/react/index';
+import { requestDeletePost } from '../../../actions';
 
 class AdminPostsIndex extends Component {
+  handleDelete(id) {
+    this.props.dispatch(requestDeletePost(id));
+    this.props.dispatch(actions.push(`/admin/posts/${id}/delete`));
+  }
+
   render() {
     const { posts } = this.props;
     return <Container>
@@ -13,7 +20,7 @@ class AdminPostsIndex extends Component {
             <List.Content floated='right'>
               <Button.Group size='mini' compact>
                 <Link className='ui button' to={`/admin/posts/${post.id}/edit`}>Edit</Link>
-                <Button>Delete</Button>
+                <Button onClick={e => this.handleDelete(post.id)}>Delete</Button>
               </Button.Group>
             </List.Content>
             <List.Content>
