@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { List, Container, Button } from 'semantic-ui-react';
+import { Header, List, Container, Button } from 'semantic-ui-react';
 import { actions } from '../../../../../src/index';
 import { Link } from '../../../../../src/react/index';
 import { requestDeletePost } from '../../../actions';
@@ -14,7 +14,11 @@ class AdminPostsIndex extends Component {
   render() {
     const { posts } = this.props;
     return <Container>
-      <List>
+      <div>
+        <Header floated='left' as='h1'>Posts</Header>
+        <Button floated='right' primary as={Link} to={`/admin/posts/new`}>New Post</Button>
+      </div>
+      <List style={{ clear: 'both' }}>
         {posts.map(post =>
           <List.Item key={post.id}>
             <List.Content floated='right'>

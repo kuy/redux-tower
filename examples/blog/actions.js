@@ -5,6 +5,7 @@ import type { ActionCreator } from 'redux';
 
 export type ActionType =
   | 'REQUEST_FETCH_POSTS' | 'SUCCESS_FETCH_POSTS' | 'FAILURE_FETCH_POSTS' | 'CANCEL_FETCH_POSTS'
+  | 'REQUEST_CREATE_POST' | 'SUCCESS_CREATE_POST' | 'FAILURE_CREATE_POST' | 'CANCEL_CREATE_POST'
   | 'REQUEST_STORE_POST' | 'SUCCESS_STORE_POST' | 'FAILURE_STORE_POST' | 'CANCEL_STORE_POST'
   | 'REQUEST_SEARCH'
   | 'REQUEST_LOGIN' | 'SUCCESS_LOGIN' | 'FAILURE_LOGIN'
@@ -25,6 +26,15 @@ export const requestFetchPosts: ActionCreator = createAction(REQUEST_FETCH_POSTS
 export const successFetchPosts: ActionCreator = createAction(SUCCESS_FETCH_POSTS);
 export const failureFetchPosts: ActionCreator = createAction(FAILURE_FETCH_POSTS);
 export const cancelFetchPosts: ActionCreator = createAction(CANCEL_FETCH_POSTS);
+
+export const REQUEST_CREATE_POST: ActionType = 'REQUEST_CREATE_POST';
+export const SUCCESS_CREATE_POST: ActionType = 'SUCCESS_CREATE_POST';
+export const FAILURE_CREATE_POST: ActionType = 'FAILURE_CREATE_POST';
+export const CANCEL_CREATE_POST: ActionType = 'CANCEL_CREATE_POST';
+export const requestCreatePost: ActionCreator = createAction(REQUEST_CREATE_POST);
+export const successCreatePost: ActionCreator = createAction(SUCCESS_CREATE_POST);
+export const failureCreatePost: ActionCreator = createAction(FAILURE_CREATE_POST);
+export const cancelCreatePost: ActionCreator = createAction(CANCEL_CREATE_POST);
 
 export const REQUEST_STORE_POST: ActionType = 'REQUEST_STORE_POST';
 export const SUCCESS_STORE_POST: ActionType = 'SUCCESS_STORE_POST';

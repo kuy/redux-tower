@@ -4,9 +4,10 @@ import { put, call, fork, takeEvery } from 'redux-saga/effects';
 import * as api from '../api';
 import {
   requestFetchPosts, successFetchPosts, failureFetchPosts,
+  successCreatePost, failureCreatePost,
   successStorePost, failureStorePost,
   successDeletePost, failureDeletePost,
-  REQUEST_STORE_POST, REQUEST_DELETE_POST
+  REQUEST_CREATE_POST, REQUEST_STORE_POST, REQUEST_DELETE_POST
 } from '../actions';
 import type { IOEffect } from 'redux-saga/effects';
 import type { PostId, Post, QueryParams } from '../api';
@@ -32,6 +33,15 @@ export function* loadPost(id: PostId): Generator<IOEffect,void,*> {
   }
 }
 
+function* createPost({ payload }: Action) {
+  const { data, error } = yield call(api.posts.create, payload);
+  if (data && !error) {
+    yield put(successCreatePost(data));
+  } else {
+    yield put(failureCreatePost(error));
+  }
+}
+
 function* storePost({ payload }: Action) {
   const { data, error } = yield call(api.posts.update, payload);
   if (data && !error) {
@@ -51,6 +61,7 @@ function* deletePost({ payload }: Action) {
 }
 
 export default function* postsSaga(): Generator<IOEffect,void,*> {
+  yield takeEvery(REQUEST_CREATE_POST, createPost);
   yield takeEvery(REQUEST_STORE_POST, storePost);
   yield takeEvery(REQUEST_DELETE_POST, deletePost);
 }

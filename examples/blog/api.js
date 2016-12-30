@@ -1,11 +1,18 @@
 // @flow
 
 export type PostId = string;
-export type Post = {
-  id: PostId,
+export type PostData = {
   title: string,
   body: string,
 };
+export type Post = PostData & {
+  id: PostId,
+};
+
+const nextId = (() => {
+  let n = 5;
+  return () => (n++).toString();
+})();
 
 const POSTS = {
   list: ['0', '1', '2', '3', '4'],
@@ -108,6 +115,12 @@ export const posts = {
         entities: { [id]: POSTS.entities[id] }
       } 
     });
+  },
+  create({ title, body }: PostData) {
+    const id = nextId();
+    POSTS.list.push(id);
+    POSTS.entities[id] = { id, title, body };
+    return posts.one(id);
   },
   update({ id, title, body }: Post) {
     POSTS.entities[id] = { id, title, body };

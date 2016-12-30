@@ -4,6 +4,7 @@ import { put, call, fork, take, select } from 'redux-saga/effects';
 import { createBrowserHistory, createMiddleware, saga as router, actions } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
 import {
+  SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST,
   SUCCESS_STORE_POST, FAILURE_STORE_POST, CANCEL_STORE_POST,
   SUCCESS_DELETE_POST, FAILURE_DELETE_POST, CANCEL_DELETE_POST,
   SUCCESS_LOGIN, FAILURE_LOGIN, SUCCESS_LOGOUT, FAILURE_LOGOUT,
@@ -16,6 +17,7 @@ import About from '../pages/about';
 import Loading from '../pages/loading';
 import UsersLogin from '../pages/users/login';
 import AdminPostsIndex from '../pages/admin/posts/index';
+import AdminPostsNew from '../pages/admin/posts/new';
 import AdminPostsEdit from '../pages/admin/posts/edit';
 
 import type { IOEffect } from 'redux-saga/effects';
@@ -70,6 +72,12 @@ const routes = {
         query.limit = 10;
         yield call(loadPosts, query);
         yield put(actions.changeComponent(AdminPostsIndex));
+      },
+      '/new': AdminPostsNew,
+      '/create': function* adminPostsCreateAction() {
+        // FIXME: Routing based on the result
+        yield take([SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST]);
+        yield put(actions.replace('/admin/posts'));
       },
       '/:id/edit': [function* adminPostsEditPage({ params: { id } }) {
         yield call(loadPost, id);
