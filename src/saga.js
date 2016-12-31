@@ -217,6 +217,9 @@ function* handleHistoryAction({ history }) {
 }
 
 export default function* routerSaga(options) {
+  if (typeof options.offset === 'undefined') {
+    options.offset = '';
+  }
   yield fork(handleLocationChange, options);
   yield fork(handleHistoryAction, options);
 }
