@@ -108,10 +108,11 @@ function* cancel() {
   yield put(cancelFetchPosts());
 }
 
+const offset = '/blog';
 export const interceptor = createMiddleware();
 
 export default function* routesSaga(): Generator<IOEffect,void,*> {
   const history = createBrowserHistory();
   const channels = { middleware: interceptor.channel };
-  yield fork(router, { history, routes, initial: Loading, cancel, channels });
+  yield fork(router, { history, routes, initial: Loading, cancel, channels, offset });
 }

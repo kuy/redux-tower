@@ -206,6 +206,7 @@ Don't forget to pass the option when you fork. Here is a list of options.
 + routes: A route definition that previously introduced.
 * initial: [Optional] Initial component, which is used until a location change is occurred.
 * cancel: [Optional] A saga, which is called when a running route action was cancelled by other route actions.
+* offset: [Optional] A offset path for `createBrowserHistory()`.
 
 ```js
 import { saga as router } from 'redux-tower';

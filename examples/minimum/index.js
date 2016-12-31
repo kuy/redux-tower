@@ -51,7 +51,9 @@ const history = createHashHistory();
 
 // Saga
 function* rootSaga() {
-  yield fork(routerSaga, { history, routes });
+  // Always blank for Hash based history
+  const offset = '';
+  yield fork(routerSaga, { history, routes, offset });
 }
 
 // Reducer

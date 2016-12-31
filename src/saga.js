@@ -212,10 +212,7 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
   }
 }
 
-function* handleLocationChange({ history, routes, initial, cancel, channels }) {
-  // FIXME: Use initial path as offset
-  const offset = normOffset(history.location.pathname);
-
+function* handleLocationChange({ history, routes, initial, cancel, channels, offset }) {
   // Prepare initial state
   yield put(init({ component: initial, offset }));
 
