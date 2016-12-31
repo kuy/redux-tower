@@ -8,7 +8,7 @@ import {
 import { parseQueryString, normOffset, removeOffset, toCamelCase, isReactComponent } from './utils';
 import preprocess from './preprocess';
 
-function createMatcher(routes) {
+export function createMatcher(routes) {
   routes = preprocess(routes);
   const matcher = ruta3();
   for (const path of Object.keys(routes)) {
@@ -58,7 +58,7 @@ function* runHook(iterator) {
 
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
-function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
+export function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
   let ret;
   while (true) {
     let { value: effect, done } = iterator.next(ret);
@@ -135,7 +135,7 @@ function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
 }
 
 // offset: normalized offset
-function* theControlTower({ history, matcher, offset, cancel }) {
+export function* theControlTower({ history, matcher, offset, cancel }) {
   // Channel to take location changes
   const channel = createLocationChannel(history);
 
