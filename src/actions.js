@@ -2,13 +2,17 @@ const PREFIX = '@@redux-tower/';
 
 export const INTERCEPTED = `${PREFIX}INTERCEPTED`;
 export const intercepted = action => ({ ...action, [INTERCEPTED]: true });
-export const unprefix = type => type.replace(PREFIX, '');
+export function unprefix(type) {
+  if (typeof type !== 'string') {
+    throw new Error(`Only accept string, but passed '${typeof type}'`);
+  }
+  return type.replace(PREFIX, '');
+}
+export const isTowerAction = action => !!(action && action.type && action.type.indexOf(PREFIX) === 0);
+export const isHistoryAction = action => !!(action && action.type && HISTORY_ACTIONS.indexOf(action.type) !== -1);
+export const isIntercepted = action => !!(action && action[INTERCEPTED]);
 
-export const isTowerAction = action => action && action.type && action.type.indexOf(PREFIX) === 0;
-export const isHistoryAction = action => action && action.type && HISTORY_ACTIONS.indexOf(action.type) !== -1;
-export const isIntercepted = action => action && !!action[INTERCEPTED];
-
-const createActionCreator = type => payload => ({ type, payload });
+export const createActionCreator = type => payload => ({ type, payload });
 
 export const INIT = `${PREFIX}INIT`;
 export const CHANGE_COMPONENT = `${PREFIX}CHANGE_COMPONENT`;
@@ -18,7 +22,7 @@ export const changeComponent = createActionCreator(CHANGE_COMPONENT);
 export const UPDATE_PATH_INFO = `${PREFIX}UPDATE_PATH_INFO`;
 export const updatePathInfo = createActionCreator(UPDATE_PATH_INFO);
 
-const createActionCreatorArgs = type => (...args) => ({ type, payload: args });
+export const createActionCreatorArgs = type => (...args) => ({ type, payload: args });
 
 export const PUSH = `${PREFIX}PUSH`;
 export const REPLACE = `${PREFIX}REPLACE`;

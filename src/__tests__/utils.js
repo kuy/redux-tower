@@ -1,4 +1,5 @@
 import test from 'ava';
+import { Component } from 'react';
 import * as utils from '../utils';
 
 test('normOffset', t => {
@@ -30,4 +31,14 @@ test('upperFirst', t => {
 
 test('toCamelCase', t => {
   t.is(utils.toCamelCase('REDUX_SAGA_TOWER'), 'reduxSagaTower');
+});
+
+test('isReactComponent', t => {
+  class Page extends Component {}
+  t.true(utils.isReactComponent(Page));
+  class Klass {}
+  t.false(utils.isReactComponent(Klass));
+  t.false(utils.isReactComponent(function*(){}));
+  t.false(utils.isReactComponent(function(){}));
+  t.false(utils.isReactComponent(() => {}));
 });
