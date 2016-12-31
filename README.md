@@ -150,25 +150,27 @@ const routes = {
     // Update Redux's state
     yield put(data(...));
 
-    // Pass a component you want to show
-    yield put(actions.changeComponent(Home));
+    // Yield a component you want to show directly
+    yield Home;
   },
 
   // Receive query string like '/posts?q=keyword'
   // Use method syntax
   *'/posts'({ query }) {
     yield call(loadPosts, query);
-    yield put(actions.changeComponent(PostsIndex));
+    yield PostsIndex;
   },
 
   // Receive named parameters like '/posts/1'
   '/posts/:id': function* postsShowPage({ params: { id } }) {
     yield call(loadPost, id);
-    yield put(actions.changeComponent(PostsShow));
+    yield PostsShow;
   },
 
-  // [WIP] Redirect to '/posts/:id' route with fixed parameter
-  '/about': '/posts/2',
+  // Redirect to '/posts/:id' route with fixed parameter
+  '/about': function* aboutPage() {
+    yield '/posts/2';
+  },
 
   // Assign React component directly (except Stateless Functional Components)
   '/contact': Contact,
@@ -279,7 +281,7 @@ class Page extends Component {
 ```
 
 
-## The Blueprint (not implemented all)
+## The Blueprint (mostly done!)
 
 ```js
 const routes = {
