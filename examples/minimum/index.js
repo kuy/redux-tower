@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import logger from 'redux-logger';
 import createSagaMiddleware, { delay } from 'redux-saga';
 import { call, fork, put } from 'redux-saga/effects';
-import { saga as routerSaga, reducer as routerReducer, actions, createHashHistory, createMiddleware } from '../../src/index';
+import { saga as routerSaga, reducer as routerReducer, actions, createHashHistory } from '../../src/index';
 import { Router } from '../../src/react/index';
 
 // Pages
@@ -49,15 +49,11 @@ const routes = {
 // History
 const history = createHashHistory();
 
-// Middleware
-const interceptor = createMiddleware();
-
 // Saga
 function* rootSaga() {
-  // Always blank for Hash based history
+  // Always use empty string for Hash based history
   const offset = '';
-  const channels = { middleware: interceptor.channel };
-  yield fork(routerSaga, { history, routes, offset, channels });
+  yield fork(routerSaga, { history, routes, offset });
 }
 
 // Reducer
@@ -67,7 +63,7 @@ const reducer = combineReducers(
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(reducer, {}, applyMiddleware(
-  interceptor, sagaMiddleware, logger()
+  sagaMiddleware, logger()
 ));
 sagaMiddleware.run(rootSaga);
 

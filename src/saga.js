@@ -20,19 +20,12 @@ function createMatcher(routes) {
 
 function createLocationChannel(history) {
   return eventChannel(emit => {
+    // TODO: 'action' is not used but...
     const unlisten = history.listen((location, action) => {
-      emit({ location, action });
+      emit(location);
     });
     return unlisten;
   }, buffers.expanding());
-}
-
-function takeFromChannels(channels) {
-  return race(
-    Object.keys(channels)
-      .map(name => ([name, channels[name]]))
-      .reduce((prev, [name, ch]) => ({ ...prev, [name]: take(ch) }), {})
-  );
 }
 
 // https://redux-saga.github.io/redux-saga/docs/api/index.html#blocking--nonblocking
@@ -65,7 +58,7 @@ function* runHook(iterator) {
 
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
-function* runRouteAction(iterator, hooks, candidate, cancel, channels) {
+function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
   let ret;
   while (true) {
     let { value: effect, done } = iterator.next(ret);
@@ -110,7 +103,7 @@ function* runRouteAction(iterator, hooks, candidate, cancel, channels) {
     if (isBlockEffect(effect)) {
       const { main, loc } = yield race({
         main: effect,
-        loc: call(nextLocation, channels)
+        loc: take(channel)
       });
 
       if (main) {
@@ -141,32 +134,18 @@ function* runRouteAction(iterator, hooks, candidate, cancel, channels) {
   }; 
 }
 
-function* nextLocation(channels) {
-  let { browser, middleware } = yield takeFromChannels(channels), location;
-  if (browser) {
-    location = browser.location;
-    console.log('location[browser]', location.pathname, browser.action);
-  } else {
-    const action = intercepted(middleware);
-    yield put(action);
-
-    // Take location change from browser
-    const change = yield take(channels.browser);
-    location = change.location;
-    console.log('location[middleware]', location.pathname, change.action);
-  }
-  return location;
-}
-
 // offset: normalized offset
-function* theControlTower({ history, matcher, offset, cancel, channels }) {
-  // FIXME: Initial location
+function* theControlTower({ history, matcher, offset, cancel }) {
+  // Channel to take location changes
+  const channel = createLocationChannel(history);
+
+  // Initial location
   yield put(push(removeOffset(history.location.pathname, offset)));
 
   let hooks = [], location;
   while (true) {
     if (!location) {
-      location = yield call(nextLocation, channels);
+      location = yield take(channel);
     }
 
     const pathname = removeOffset(location.pathname, offset);
@@ -200,7 +179,7 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
     // these sagas may change a component or not without running them.
     for (const fn of [...entering, action]) {
       const iterator = fn === action ? fn(args) : fn();
-      const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channels);
+      const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channel);
       hooks = ret.hooks;
       if (ret.location) {
         location = ret.location;
@@ -212,14 +191,13 @@ function* theControlTower({ history, matcher, offset, cancel, channels }) {
   }
 }
 
-function* handleLocationChange({ history, routes, initial, cancel, channels, offset }) {
+function* handleLocationChange({ history, routes, initial, cancel, offset }) {
   // Prepare initial state
   yield put(init({ component: initial, offset }));
 
   // Start routing
   const matcher = createMatcher(routes);
-  channels = { ...channels, browser: createLocationChannel(history) };
-  yield fork(theControlTower, { history, matcher, offset, cancel, channels });
+  yield fork(theControlTower, { history, matcher, offset, cancel });
 }
 
 function* handleHistoryAction({ history }) {

@@ -1,7 +1,7 @@
 // @flow
 
 import { put, call, fork, take, select } from 'redux-saga/effects';
-import { createBrowserHistory, createMiddleware, saga as router } from '../../../src/index';
+import { createBrowserHistory, saga as router } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
 import {
   SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST,
@@ -108,11 +108,8 @@ function* cancel() {
   yield put(cancelFetchPosts());
 }
 
-const offset = '/blog';
-export const interceptor = createMiddleware();
-
 export default function* routesSaga(): Generator<IOEffect,void,*> {
+  const offset = '/blog';
   const history = createBrowserHistory();
-  const channels = { middleware: interceptor.channel };
-  yield fork(router, { history, routes, initial: Loading, cancel, channels, offset });
+  yield fork(router, { history, routes, initial: Loading, cancel, offset });
 }

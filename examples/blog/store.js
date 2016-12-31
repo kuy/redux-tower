@@ -5,7 +5,6 @@ import createSagaMiddleware from 'redux-saga';
 import logger from 'redux-logger';
 import reducer from './reducers';
 import rootSaga from './sagas/index';
-import { interceptor } from './sagas/routes';
 import type { State } from './reducers';
 import type { Store, Middleware } from 'redux';
 
@@ -17,7 +16,7 @@ export default function configureStore(initialState: State): Store {
     initialState,
     composeEnhancers(
       applyMiddleware(
-        interceptor, sagaMiddleware, logger()
+        sagaMiddleware, logger()
       )
     )
   );
