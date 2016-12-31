@@ -42,7 +42,7 @@ const routes = {
   '/': Index,
   *'/tower'() {
     yield call(delay, 1000);
-    yield put(actions.changeComponent(Tower));
+    yield Tower;
   }
 };
 
@@ -51,9 +51,7 @@ const history = createHashHistory();
 
 // Saga
 function* rootSaga() {
-  // Always use empty string for Hash based history
-  const offset = '';
-  yield fork(routerSaga, { history, routes, offset });
+  yield fork(routerSaga, { history, routes });
 }
 
 // Reducer
