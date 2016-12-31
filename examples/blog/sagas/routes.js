@@ -10,6 +10,7 @@ import {
   SUCCESS_LOGIN, FAILURE_LOGIN, SUCCESS_LOGOUT, FAILURE_LOGOUT,
   cancelFetchPosts, updateDirty
 } from '../actions';
+import { isLoggedIn, isDirty } from '../reducers';
 
 import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
@@ -59,8 +60,7 @@ const routes = {
   },
   '/admin': [function* adminEnterHook() {
     console.log('admin enter hook');
-    const { login } = yield select(state => state.app);
-    if (!login) {
+    if (!(yield select(isLoggedIn))) {
       yield '/users/login';
     }
   }, {
@@ -83,8 +83,7 @@ const routes = {
         yield AdminPostsEdit;
       }, function* adminPostsEditLeaveHook() {
         console.log('admin posts edit leave hook');
-        const { dirty } = yield select(state => state.posts);
-        if (dirty) yield false;
+        if (yield select(isDirty)) yield false;
       }],
       '/:id/update': function* adminPostsUpdateAction() {
         // FIXME: Routing based on the result

@@ -36,6 +36,9 @@ const initial: State = {
   },
 };
 
+export const isLoggedIn = state => typeof state.app.login !== 'undefined';
+export const isDirty = state => typeof state.posts.dirty;
+
 function app(state: AppState = initial.app, { type, payload }: Action): AppState {
   switch (type) {
     case REQUEST_LOGIN:
