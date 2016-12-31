@@ -5,7 +5,8 @@
   "env": {
     "production": {
       "plugins": [
-        "babel-plugin-unassert"
+        "babel-plugin-unassert",
+        "babel-plugin-transform-remove-console"
       ]
     }
   }
