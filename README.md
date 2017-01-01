@@ -1,3 +1,7 @@
+[![NPM Package][npm_img]][npm_site]
+[![Travis][ci_img]][ci_site]
+[![Dependency Status][david_img]][david_site]
+
 # redux-tower
 
 [Saga](https://github.com/redux-saga/redux-saga) powered routing engine for [Redux](http://redux.js.org/) apps.
@@ -134,9 +138,12 @@ In this section, I'd like to introduce them step by step and how to integrate wi
 ### Routes
 
 First of all, you need to have the route definition which contains URL patterns and route actions.
-Behavior is deadly simple. When a url pattern is activated, the engine tests URL patterns, and pick a route action from your definition, and calls it.
+The behavior of routing is deadly simple. When a url pattern is activated, the engine tests URL patterns,
+and pick a route action from your definition, and runs it.
+The difference with other routing libraries is that this is not a simple component switcher like react-router.
+You can write a route action includes async control flows and interactions with Redux naturally to fully control the process of routing thanks to redux-saga.
+For increasing readability and productivity, redux-tower allows you to use a shorthand notation for changing components and redirections.
 The URL pattern is a plain string, but is able to capture a part of URL and captured values are passed to a route action as named parameters.
-You can write a route action includes async control flows and interactions with Redux naturally thanks to redux-saga.
 
 ```js
 import { actions } from 'redux-tower';
@@ -150,30 +157,78 @@ const routes = {
     // Update Redux's state
     yield put(data(...));
 
-    // Yield a component you want to show directly
+    // Change component (shorthand)
     yield Home;
   },
 
-  // Receive query string like '/posts?q=keyword'
-  // Use method syntax
-  *'/posts'({ query }) {
-    yield call(loadPosts, query);
-    yield PostsIndex;
+  // Nested routes
+  '/posts': {
+    // Receive query string like '/posts?q=keyword'
+    // Use method syntax for route action
+    *'/'({ query }) {
+      yield call(loadPosts, query);
+
+      // Change component (not shorthand)
+      yield put(actions.changeComponent(PostsIndex));
+    },
+
+    // Receive named parameters like '/posts/1'
+    '/:id': function* postsShowPage({ params: { id } }) {
+      yield call(loadPost, id);
+      yield PostsShow;
+    },
   },
 
-  // Receive named parameters like '/posts/1'
-  '/posts/:id': function* postsShowPage({ params: { id } }) {
-    yield call(loadPost, id);
-    yield PostsShow;
-  },
-
-  // Redirect to '/posts/:id' route with fixed parameter
+  // Redirect to '/posts/:id' route with fixed parameter (shorthand)
   '/about': function* aboutPage() {
     yield '/posts/2';
   },
 
+  // Change component
   // Assign React component directly (except Stateless Functional Components)
   '/contact': Contact,
+};
+```
+
+### Hooks
+
+In the route definition, a route action can have the entering/leaving hooks that are ran before/after the main action.
+It's a bit tricky behavior because the both hooks have a different timing when they are executed.
+
+```js
+const routes = {
+  // ...
+
+  // Enable entering hook
+  '/admin': [function* enterAdmin() {
+    // Check logged-in or not
+    if (yield select(isNotLoggedIn)) {
+      // Redirect to login page
+      yield '/users/login';
+    }
+  }, {
+    // Admin section
+    '/': 'dashboard',
+    '/dashboard': AdminDashboard,
+    '/posts': {
+      // Enable leaving hook
+      '/:id/edit': [AdminPostsEdit, function* leaveEdit() {
+        // Dirty check
+        if (yield select(isDirty)) {
+          // Prevent page transition
+          yield false;
+        }
+      }]
+    }
+  }]
+
+  '/users': {
+    '/login': UsersLogin,
+    '/logout': function* logout() {
+      yield call(logout);
+      yield '/';
+    },
+  }
 };
 ```
 
@@ -228,7 +283,7 @@ A reducer is used to expose the location data to Redux's store.
 + path: String. Path string, which is stripped a query string.
 + params: Object. Named parameters, which is mapped with placeholders in route patterns. `/users/:id` with `/users/1` gets `{ id: '1' }`.
 + query: Object. Parsed query string. `/search?q=hoge` gets `{ q: 'hoge' }`.
-+ splats: Array. *[WIP]*
++ splats: Array.
 
 ```js
 import { reducer as router } from 'redux-tower';
@@ -349,11 +404,6 @@ const routes = {
 ```
 
 
-## Author
-
-Yuki Kodama / [@kuy](https://twitter.com/kuy)
-
-
 ## Acknowledgment
 
 redux-tower has inspired by [redux-saga-router](https://github.com/jfairbank/redux-saga-router).
@@ -363,3 +413,16 @@ Big thanks to [@jfairbank](https://github.com/jfairbank).
 ## License
 
 MIT
+
+
+## Author
+
+Yuki Kodama / [@kuy](https://twitter.com/kuy)
+
+
+[npm_img]: https://img.shields.io/npm/v/redux-tower.svg
+[npm_site]: https://www.npmjs.org/package/redux-tower
+[ci_img]: https://img.shields.io/travis/kuy/redux-tower/master.svg?style=flat-square
+[ci_site]: https://travis-ci.org/kuy/redux-tower
+[david_img]: https://img.shields.io/david/kuy/redux-tower.svg
+[david_site]: https://david-dm.org/kuy/redux-tower
