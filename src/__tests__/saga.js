@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import test from 'ava';
 import { Component } from 'react';
 import { put } from 'redux-saga/effects';
