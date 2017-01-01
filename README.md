@@ -260,9 +260,9 @@ Don't forget to pass the option when you fork. Here is a list of options.
 
 + history: An instance of `createBrowserHistory()` or `createHashHistory()`.
 + routes: A route definition that previously introduced.
-* initial: [Optional] Initial component, which is used until a location change is occurred.
+* initial: [Optional] Initial component, which is used until a first location change is occurred.
 * cancel: [Optional] A saga, which is called when a running route action was cancelled by other route actions.
-* offset: [Optional] A offset path for `createBrowserHistory()`.
+* offset: [Optional] A offset path for `createBrowserHistory()`. No need to use for `createHashHistory()`.
 
 ```js
 import { saga as router } from 'redux-tower';
@@ -283,7 +283,7 @@ A reducer is used to expose the location data to Redux's store.
 + path: String. Path string, which is stripped a query string.
 + params: Object. Named parameters, which is mapped with placeholders in route patterns. `/users/:id` with `/users/1` gets `{ id: '1' }`.
 + query: Object. Parsed query string. `/search?q=hoge` gets `{ q: 'hoge' }`.
-+ splats: Array.
++ splats: Array. Unnamed parameters, which is splatted from placeholders in route patterns. `/posts/*/*`.
 
 ```js
 import { reducer as router } from 'redux-tower';
@@ -294,6 +294,22 @@ export default combineReducers(
   { /* your reducers */, router }
 );
 ```
+
+### Actions
+
+Since this library is made for Redux, all state transitions, including routing, are triggered by actions.
+
+#### Core actions
+
++ `CHANGE_COMPONENT`: switch to other component
+
+#### History actions
+
++ `PUSH`: pushes a new path
++ `REPLACE`: repalces with a new path
++ `GO`: 
++ `GO_BACK`: 
++ `GO_FORWARD`: 
 
 ### React components
 
