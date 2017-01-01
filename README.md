@@ -208,7 +208,7 @@ const routes = {
     }
   }, {
     // Admin section
-    '/': 'dashboard',
+    '/': './dashboard',
     '/dashboard': AdminDashboard,
     '/posts': {
       // Enable leaving hook
