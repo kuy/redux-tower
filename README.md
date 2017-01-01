@@ -43,8 +43,8 @@ because both react-router and redux-saga-router are working separately. I feel i
 
 ### Online Demo
 
-+ **[Minimum](https://github.com/kuy/redux-tower/tree/master/examples/minimum)**: [Demo](http://kuy.github.io/redux-tower/minimum/) | Minimum usage example with Hash based history.
-+ **[Blog](https://github.com/kuy/redux-tower/tree/master/examples/blog)**: [Demo](http://kuy.github.io/redux-tower/blog/) | Real World Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
++ **Minimum**: [Source](https://github.com/kuy/redux-tower/tree/master/examples/minimum) | [Demo](http://kuy.github.io/redux-tower/minimum/) | Minimum usage example with Hash based history.
++ **Blog**: [Source](https://github.com/kuy/redux-tower/tree/master/examples/blog) | [Demo](http://kuy.github.io/redux-tower/blog/) | Real World Blog app using [Semantic UI React](https://github.com/Semantic-Org/Semantic-UI-React).
 
 [redux-logger](https://github.com/evgenyrodionov/redux-logger) is enabled. Open the JavaScript console of developer tools in your browser.
 You can also use [Redux DevTools extension](https://github.com/zalmoxisus/redux-devtools-extension) to see the store and the actions being fired.
