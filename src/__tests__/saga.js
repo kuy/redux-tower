@@ -12,7 +12,7 @@ function isChannel(obj) {
     && typeof obj.close === 'function';
 }
 
-test.only('theControlTower', t => {
+test('theControlTower', t => {
   class Index extends Component {}
   class Hoge extends Component {}
   const routes = {
