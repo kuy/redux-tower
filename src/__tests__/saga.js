@@ -91,7 +91,7 @@ function moveTo(i, pathname) {
   return saga.runRouteAction(...ret.value.CALL.args);
 }
 
-test.only('theControlTower - entering hooks', async t => {
+test('theControlTower - entering hooks', async t => {
   const isNotLoggedIn = () => {};
   const routes = {
     '/': Index,
@@ -255,7 +255,7 @@ test('theControlTower - leaving hooks', t => {
       '/:id/edit': [Edit, leave]
     },
   };
-  const i = createTower(routes);
+  const { tower: i } = createTower(routes);
 
   // Run main action
   let a = moveTo(i, '/posts/10/edit');
