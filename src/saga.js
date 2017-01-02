@@ -115,8 +115,10 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
       } else if (loc) {
         console.log('cancel', loc);
 
-        // Run cancel hook. Ignore even if prevented
-        yield call(runHook, cancel());
+        if (typeof cancel === 'function') {
+          // Run cancel hook. Ignore even if prevented
+          yield call(runHook, cancel());
+        }
 
         return {
           prevented: true, // Prevented

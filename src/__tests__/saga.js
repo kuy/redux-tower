@@ -1,6 +1,6 @@
 import test from 'ava';
 import { Component } from 'react';
-import { put, select } from 'redux-saga/effects';
+import { put, select, call } from 'redux-saga/effects';
 import { createMemoryHistory } from 'history';
 import * as saga from '../saga';
 import * as actions from '../actions';
@@ -19,9 +19,12 @@ class Edit extends Component {}
 
 function createTower(routes) {
   const offset = '';
+  const cancel = function* () {
+    yield put({ type: 'CANCEL' });
+  };
   const matcher = saga.createMatcher(routes);
   const history = createMemoryHistory();
-  return { tower: saga.theControlTower({ history, matcher, offset }), history };
+  return { tower: saga.theControlTower({ history, matcher, offset, cancel }), history, cancel };
 }
 
 test('theControlTower - basic', t => {
@@ -91,7 +94,7 @@ function moveTo(i, pathname) {
   return saga.runRouteAction(...ret.value.CALL.args);
 }
 
-test.only('theControlTower - entering hooks', async t => {
+test('theControlTower - entering hooks', async t => {
   const isNotLoggedIn = () => {};
   const routes = {
     '/': Index,
@@ -330,5 +333,107 @@ test('theControlTower - leaving hooks', t => {
 
   // Wait location change
   ret = i.next(ret.value);
+  t.true(isChannel(ret.value.TAKE.channel));
+});
+
+test.only('theControlTower - cancel hook', async t => {
+  const api = () => {};
+  const routes = {
+    '/': function* index() {
+      yield call(api);
+      yield Index;
+    },
+    '/hoge': Hoge,
+  };
+  const { tower, history, cancel } = createTower(routes);
+  const sagas = [tower];
+
+  // Run main action
+  sagas.push(moveTo(sagas[0], '/'));
+
+  // Race API call and location change
+  let ret = sagas[1].next();
+  let race = ret.value.RACE;
+  t.deepEqual(race.main.CALL, {
+    context: null,
+    fn: api,
+    args: [],
+  });
+  let channel = race.loc.TAKE.channel;
+  t.true(isChannel(channel));
+
+  // Simulate: fire location change event while API calling
+  history.push('/hoge');
+
+  // Simulate: get new location from history channel
+  let val = await new Promise(resolve =>
+    channel.take(loc => resolve(loc))
+  );
+
+  // Run cancel hook
+  ret = sagas[1].next({ loc: val });
+  t.is(ret.value.CALL.fn, saga.runHook);
+  sagas.push(saga.runHook(...ret.value.CALL.args));
+
+  // Dispatch something from cancel hook
+  ret = sagas[2].next();
+  t.deepEqual(ret.value.PUT, {
+    channel: null,
+    action: {
+      type: 'CANCEL'
+    },
+  });
+
+  // Done cancel hook, back to runRouteAction
+  ret = sagas[2].next();
+  t.deepEqual(ret, { value: true, done: true });
+
+  sagas.pop();
+
+  // Cancelled main action by location change, back to Tower
+  ret = sagas[1].next(ret.value);
+  t.true(ret.value.prevented);
+  t.deepEqual(ret.value.hooks, []);
+  t.is(ret.value.location.pathname, '/hoge');
+  t.is(ret.value.location.search, '');
+  t.is(ret.value.location.hash, '');
+  t.is(ret.value.location.state, undefined);
+  t.true(ret.done);
+
+  sagas.pop();
+
+  // Restart with new location '/hoge'
+  ret = sagas[0].next(ret.value);
+  t.deepEqual(ret.value.PUT, {
+    channel: null,
+    action: {
+      type: '@@redux-tower/UPDATE_PATH_INFO',
+      payload: { path: '/hoge', params: {}, query: {}, splats: [], route: '/hoge' }
+    },
+  });
+
+  // Run main action
+  ret = sagas[0].next();
+  t.is(ret.value.CALL.fn, saga.runRouteAction);
+  sagas.push(saga.runRouteAction(...ret.value.CALL.args));
+
+  // Show Hoge page
+  ret = sagas[1].next();
+  t.deepEqual(ret.value.PUT, {
+    channel: null,
+    action: {
+      type: '@@redux-tower/CHANGE_COMPONENT',
+      payload: Hoge
+    },
+  });
+
+  // Done main action, back to Tower
+  ret = sagas[1].next();
+  t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
+
+  sagas.pop();
+
+  // Wait location change
+  ret = sagas[0].next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 });
