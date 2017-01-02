@@ -135,7 +135,7 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
     if (asHook && isPrevent(effect)) {
       console.log('prevent effect is yielded', effect);
       return {
-        prevented: true,     // Prevented in action or entering hook
+        prevented: true,     // Prevented in entering hooks
         hooks,               // Keep current leaving hooks
         location: undefined, // No location change
       };
