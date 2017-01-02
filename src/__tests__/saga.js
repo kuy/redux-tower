@@ -78,7 +78,7 @@ test('theControlTower - basic', t => {
   ret = a.next();
   t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
 
-  // Wait location change (loop)
+  // Wait location change
   ret = i.next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 });
@@ -91,7 +91,7 @@ function moveTo(i, pathname) {
   return saga.runRouteAction(...ret.value.CALL.args);
 }
 
-test('theControlTower - entering hooks', async t => {
+test.only('theControlTower - entering hooks', async t => {
   const isNotLoggedIn = () => {};
   const routes = {
     '/': Index,
@@ -129,45 +129,17 @@ test('theControlTower - entering hooks', async t => {
 
   // Done entering hook, back to Tower
   ret = a.next();
-  t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
+  t.deepEqual(ret, { value: { prevented: true, hooks: [], location: undefined }, done: true });
 
-  // Run main action
-  ret = i.next(ret.value);
-  t.is(ret.value.CALL.fn, saga.runRouteAction);
-  a = saga.runRouteAction(...ret.value.CALL.args);
-
-  // Show Dashboard page
-  ret = a.next();
-  t.deepEqual(ret.value.PUT, {
-    channel: null,
-    action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Dashboard
-    },
-  });
-
-  // Done main action, back to Tower
-  ret = a.next();
-  t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
-
-  // Wait location change (loop)
+  // Wait location change
   ret = i.next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 
-  // Simulate: drive event channel
+  // Simulate: get queued value from history channel
   let val = await new Promise(resolve => {
     ret.value.TAKE.channel.take(loc => resolve(loc));
   });
-
-  // Redirect to '/login' by entering hook
-  ret = i.next(val);
-  t.deepEqual(ret.value.PUT, {
-    channel: null,
-    action: {
-      type: '@@redux-tower/UPDATE_PATH_INFO',
-      payload: { path: '/login', params: {}, query: {}, splats: [], route: '/login' }
-    },
-  });
+  i.next(val);
 
   // Run main action
   ret = i.next();
@@ -188,19 +160,12 @@ test('theControlTower - entering hooks', async t => {
   ret = a.next();
   t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
 
-  // Wait location change (loop)
+  // Wait location change
   ret = i.next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 
   // Go to '/admin' (try again)
-  ret = i.next({ pathname: '/admin', search: '' });
-  t.deepEqual(ret.value.PUT, {
-    channel: null,
-    action: {
-      type: '@@redux-tower/UPDATE_PATH_INFO',
-      payload: { path: '/admin', params: {}, query: {}, splats: [], route: '/admin' }
-    },
-  });
+  i.next({ pathname: '/admin', search: '' });
 
   // Run entering hook
   ret = i.next();
@@ -237,7 +202,7 @@ test('theControlTower - entering hooks', async t => {
   ret = a.next();
   t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
 
-  // Wait location change (loop)
+  // Wait location change
   ret = i.next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 });
@@ -274,7 +239,7 @@ test('theControlTower - leaving hooks', t => {
   ret = a.next();
   t.deepEqual(ret, { value: { prevented: false, hooks: [leave], location: undefined }, done: true });
 
-  // Wait location change (loop)
+  // Wait location change
   ret = i.next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 
@@ -305,7 +270,7 @@ test('theControlTower - leaving hooks', t => {
     done: false
   });
 
-  // Prevented by leaving hook
+  // Prevented in leaving hook
   ret = b.next(true); // result of isDirty
   t.deepEqual(ret, { value: false, done: true });
 
@@ -313,7 +278,7 @@ test('theControlTower - leaving hooks', t => {
   ret = a.next(false);
   t.deepEqual(ret, { value: { prevented: true, hooks: [leave], location: undefined }, done: true });
 
-  // Wait location change (loop)
+  // Wait location change
   ret = i.next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 
@@ -344,7 +309,7 @@ test('theControlTower - leaving hooks', t => {
     done: false
   });
 
-  // Prevented by leaving hook
+  // Prevented in leaving hook
   // Done leaving hook, back to main action
   ret = b.next(false); // result of isDirty
   t.deepEqual(ret, { value: true, done: true });
@@ -363,7 +328,7 @@ test('theControlTower - leaving hooks', t => {
   ret = a.next(true);
   t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
 
-  // Wait location change (loop)
+  // Wait location change
   ret = i.next(ret.value);
   t.true(isChannel(ret.value.TAKE.channel));
 });

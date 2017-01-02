@@ -30,12 +30,16 @@ function createLocationChannel(history) {
 
 // https://redux-saga.github.io/redux-saga/docs/api/index.html#blocking--nonblocking
 const EFFECT_TYPES = ['TAKE', 'CALL', 'APPLY', 'CPS', 'JOIN', 'CANCEL', 'FLUSH', 'CANCELLED', 'RACE'];
-function isBlockEffect(effect) {
+function isBlock(effect) {
   return EFFECT_TYPES.map(type => !!effect[type]).reduce((p, c) => p || c, false);
 }
 
-function isChangeComponent(effect) {
-  return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === CHANGE_COMPONENT);
+function isPut(effect, type) {
+  return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === type);
+}
+
+function isPrevent(e) {
+  return isPut(e, CHANGE_COMPONENT) || isPut(e, PUSH) || isPut(e, REPLACE);
 }
 
 export function* runHook(iterator) {
@@ -58,7 +62,7 @@ export function* runHook(iterator) {
 
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
-export function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
+export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asHook) {
   let ret;
   while (true) {
     let { value: effect, done } = iterator.next(ret);
@@ -76,7 +80,7 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
       effect = put(changeComponent(effect));
     }
 
-    if (isChangeComponent(effect)) {
+    if (isPut(effect, CHANGE_COMPONENT)) {
       // Run leaving hooks before changing component
       let prevented = false;
       console.log('run leaving hooks', hooks);
@@ -100,7 +104,7 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
       console.log('new leaving hooks', hooks);
     }
 
-    if (isBlockEffect(effect)) {
+    if (isBlock(effect)) {
       const { main, loc } = yield race({
         main: effect,
         loc: take(channel)
@@ -124,6 +128,15 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel) {
       }
     } else {
       ret = yield effect;
+    }
+
+    if (asHook && isPrevent(effect)) {
+      console.log('prevent effect is yielded', effect);
+      return {
+        prevented: true,     // Prevented in action or entering hook
+        hooks,               // Keep current leaving hooks
+        location: undefined, // No location change
+      };
     }
   }
 
@@ -178,8 +191,8 @@ export function* theControlTower({ history, matcher, offset, cancel }) {
     // XXX: Thanks to the power of generator function, I can check that
     // these sagas may change a component or not without running them.
     for (const fn of [...entering, action]) {
-      const iterator = fn === action ? fn(args) : fn();
-      const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channel);
+      const [iterator, asHook] = fn === action ? [fn(args), false] : [fn(), true];
+      const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channel, asHook);
       hooks = ret.hooks;
       if (ret.location) {
         location = ret.location;
