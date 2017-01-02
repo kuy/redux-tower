@@ -32,7 +32,7 @@ test('theControlTower - basic', t => {
     '/': Index,
     '/hoge': Hoge,
   };
-  const { tower: i } = createTower(routes);
+  const { tower: i, cancel } = createTower(routes);
 
   let ret = i.next();
   t.deepEqual(ret.value.PUT, {
@@ -61,7 +61,7 @@ test('theControlTower - basic', t => {
   t.is(typeof args[0]._invoke, 'function');
   t.deepEqual(args[1], []);
   t.deepEqual(args[2], []);
-  t.is(args[3], undefined);
+  t.is(args[3], cancel);
   t.true(isChannel(args[4]));
 
   // Run main action
@@ -336,7 +336,7 @@ test('theControlTower - leaving hooks', t => {
   t.true(isChannel(ret.value.TAKE.channel));
 });
 
-test.only('theControlTower - cancel hook', async t => {
+test('theControlTower - cancel hook', async t => {
   const api = () => {};
   const routes = {
     '/': function* index() {
