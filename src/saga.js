@@ -38,7 +38,7 @@ function isChangeComponent(effect) {
   return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === CHANGE_COMPONENT);
 }
 
-function* runHook(iterator) {
+export function* runHook(iterator) {
   let ret;
   while (true) {
     const { value: effect, done } = iterator.next(ret);
