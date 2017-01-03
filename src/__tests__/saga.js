@@ -411,14 +411,7 @@ test('theControlTower - cancel hook', async t => {
   sagas.pop();
 
   // Restart with new location '/hoge'
-  ret = sagas[0].next(ret.value);
-  t.deepEqual(ret.value.PUT, {
-    channel: null,
-    action: {
-      type: '@@redux-tower/UPDATE_PATH_INFO',
-      payload: { path: '/hoge', params: {}, query: {}, splats: [], route: '/hoge' }
-    },
-  });
+  sagas[0].next(ret.value);
 
   // Run main action
   ret = sagas[0].next();
