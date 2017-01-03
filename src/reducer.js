@@ -10,6 +10,9 @@ const initial = {
   offset: undefined,
 };
 
+// FIXME: Assuming fixed reducer/state name 'router'
+export const getOffset = state => state.router.offset;
+
 export default function routerReducer(state = initial, { type, payload }) {
   switch (type) {
     case INIT:

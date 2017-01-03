@@ -7,6 +7,7 @@ import {
 } from './actions';
 import { parseQueryString, normOffset, removeOffset, toCamelCase, isReactComponent } from './utils';
 import preprocess from './preprocess';
+import { getOffset } from './reducer';
 
 export function createMatcher(routes) {
   routes = preprocess(routes);
@@ -221,7 +222,7 @@ function* handleHistoryAction({ history }) {
 
     if (type === PUSH || type === REPLACE) {
       // Prepend offset to path at first argument in payload
-      const { offset } = yield select(state => state.router);
+      const offset = yield select(getOffset);
       if (offset) {
         payload[0] = offset + payload[0];
       }
