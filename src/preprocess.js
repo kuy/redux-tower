@@ -48,7 +48,7 @@ export function resolve(routes) {
   }
 }
 
-export function interpolate(routes, enterHooks = [], leaveHooks = []) {
+export function interpolate(routes, entering = [], leaving = []) {
   const r = {};
   for (const segment of Object.keys(routes)) {
     let rval = routes[segment];
@@ -65,7 +65,7 @@ export function interpolate(routes, enterHooks = [], leaveHooks = []) {
         case 2:
           if (typeof rval[0] !== 'object' && typeof rval[1] !== 'object') {
             // Special pattern: route action with leave hook
-            r[segment] = [enterHooks, rval[0], [rval[1], ...leaveHooks]];
+            r[segment] = [entering, rval[0], [rval[1], ...leaving]];
             continue;
           }
           if (typeof rval[0] === 'object') {
@@ -88,12 +88,12 @@ export function interpolate(routes, enterHooks = [], leaveHooks = []) {
       // Normalize recursively
       r[segment] = interpolate(
         action,
-        [...enterHooks, enter].filter(h => !!h),
-        [leave, ...leaveHooks].filter(h => !!h)
+        [...entering, enter].filter(h => !!h),
+        [leave, ...leaving].filter(h => !!h)
       );
     } else {
       // Interpolate hooks
-      r[segment] = [enterHooks, rval, leaveHooks];
+      r[segment] = [entering, rval, leaving];
     }
   }
   return r;
@@ -183,6 +183,7 @@ export function flatten(routes) {
   return r;
 }
 
+// NOTE: Destructive operation
 function amend(routes) {
   for (const segment of Object.keys(routes)) {
     if (isPrefixed(segment)) {
