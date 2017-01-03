@@ -24,7 +24,7 @@
     "start": "./node_modules/.bin/webpack-dev-server --progress --content-base examples/",
     "build": "NODE_ENV=production ./node_modules/.bin/babel src --out-dir lib --ignore __tests__",
     "build:examples": "NODE_ENV=production ./node_modules/.bin/webpack",
-    "test": "ava",
+    "test": "nyc ava",
     "flow": "./node_modules/.bin/flow",
     "clean": "./node_modules/.bin/rimraf lib",
     "prepublish": "npm run clean && npm run build"
