@@ -1,16 +1,14 @@
 import { put } from 'redux-saga/effects';
-import { changeComponent, PREFIX } from './actions';
+import { changeComponent, isPrefixed, PREFIX } from './actions';
 import { isReactComponent } from './utils';
 
-export const ERROR = `${PREFIX}ERROR`;
 export const ROUTES = `${PREFIX}ROUTES`;
 
+export const ERROR = `${PREFIX}ERROR`;
+export const getErrorAction = matcher => matcher[ROUTES][ERROR];
+
 export const CANCEL = `${PREFIX}CANCEL`;
-export const getCancelAction = matcher => {
-  if (matcher[ROUTES][CANCEL]) {
-    return matcher[ROUTES][CANCEL][1];
-  }
-};
+export const getCancelAction = matcher => matcher[ROUTES][CANCEL];
 
 function createRouteAction(Component) {
   const name = `generated${Component.displayName || 'Unknown'}Component`;
@@ -180,6 +178,14 @@ export function flatten(routes) {
   return r;
 }
 
+function amend(routes) {
+  for (const segment of Object.keys(routes)) {
+    if (isPrefixed(segment)) {
+      routes[segment] = routes[segment][1];
+    }
+  }
+}
+
 export default function preprocess(routes) {
   // 1. Interpolate hooks in nested routes
   routes = interpolate(routes);
@@ -197,6 +203,9 @@ export default function preprocess(routes) {
 
   // 4. Resolve redirect/alias with detecting circular references
   resolve(routes);
+
+  // 5. Amend configuration routes
+  amend(routes);
 
   return routes;
 }

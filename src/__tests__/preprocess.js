@@ -1,6 +1,8 @@
 import test from 'ava';
 import { Component } from 'react';
-import preprocess, { flatten, interpolate, resolve, resolveRelative } from '../preprocess';
+import preprocess, {
+  flatten, interpolate, resolve, resolveRelative, CANCEL, ERROR
+} from '../preprocess';
 
 class Page extends Component {}
 
@@ -50,6 +52,19 @@ test('preprocess - nested', t => {
   t.is(actual['/blog/posts/:id'][1](), 'posts-show');
   t.is(actual['/blog/posts/new'][1](), 'posts-new');
   t.is(actual['/blog/posts/about'][1](), 'about');
+});
+
+test('preprocess - ignore configuration routes', t => {
+  const fn = name => () => name;
+  let routes = {
+    '/': Page,
+    [CANCEL]: fn('cancel'),
+    [ERROR]: fn('error'),
+  };
+  let actual = preprocess(routes);
+  t.is(actual['/'].length, 3);
+  t.is(actual[CANCEL](), 'cancel');
+  t.is(actual[ERROR](), 'error');
 });
 
 test('flatten - basic', t => {

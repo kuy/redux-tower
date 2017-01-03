@@ -8,7 +8,8 @@ export function unprefix(type) {
   }
   return type.replace(PREFIX, '');
 }
-export const isTowerAction = action => !!(action && action.type && action.type.indexOf(PREFIX) === 0);
+export const isPrefixed = name => name.indexOf(PREFIX) === 0;
+export const isTowerAction = action => !!(action && action.type && isPrefixed(action.type));
 export const isHistoryAction = action => !!(action && action.type && HISTORY_ACTIONS.indexOf(action.type) !== -1);
 export const isIntercepted = action => !!(action && action[INTERCEPTED]);
 

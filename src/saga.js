@@ -9,7 +9,7 @@ import {
   parseQueryString, normOffset, removeOffset, toCamelCase,
   isReactComponent, isBlock, isPut, isPrevent
 } from './utils';
-import preprocess, { ERROR, ROUTES, getCancelAction } from './preprocess';
+import preprocess, { ROUTES, getCancelAction, getErrorAction } from './preprocess';
 import { getOffset } from './reducer';
 
 export function createMatcher(routes) {
@@ -129,7 +129,9 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
 
 // offset: normalized offset
 export function* theControlTower({ history, matcher, offset }) {
+  // Get configuration routes
   const cancel = getCancelAction(matcher);
+  const error = getErrorAction(matcher);
 
   // Channel to take location changes
   const channel = createLocationChannel(history);
@@ -164,8 +166,7 @@ export function* theControlTower({ history, matcher, offset }) {
       [entering, action, leaving] = actions;
     } else {
       console.log('matched', '[no matched route]');
-
-      if (!matcher[ROUTES][ERROR]) {
+      if (!error) {
         console.error(`No matched route and error page: ${pathname} (original='${location.pathname}', offset='${offset}')`);
         location = undefined; // Clear to prevent infinite loop
         continue;
@@ -173,7 +174,7 @@ export function* theControlTower({ history, matcher, offset }) {
 
       // Fallback to error page
       args = {};
-      [entering, action, leaving] = matcher[ROUTES][ERROR];
+      [entering, action, leaving] = [[], error, []];
     }
 
     console.log('actions', entering, action, leaving);
