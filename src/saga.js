@@ -43,24 +43,6 @@ function isPrevent(e) {
   return isPut(e, CHANGE_COMPONENT) || isPut(e, PUSH) || isPut(e, REPLACE);
 }
 
-export function* runHook(iterator) {
-  let ret;
-  while (true) {
-    const { value: effect, done } = iterator.next(ret);
-    if (done) break;
-
-    if (effect === false) {
-      console.log('prevented');
-      return false; // Prevented
-    }
-
-    console.log('effect', effect);
-    ret = yield effect;
-  }
-
-  return true; // Not prevented
-}
-
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
 export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asHook) {
@@ -70,6 +52,14 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
     if (done) break;
 
     console.log('effect', effect);
+
+    if (effect === false) {
+      return {
+        prevented: true,     // Prevented in entering/leaving hooks
+        hooks,               // Keep current leaving hooks
+        location: undefined, // No location change
+      };
+    }
 
     if (typeof effect === 'string') {
       console.log('convert to replace');
@@ -83,21 +73,18 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
 
     if (isPut(effect, CHANGE_COMPONENT)) {
       // Run leaving hooks before changing component
-      let prevented = false;
       console.log('run leaving hooks', hooks);
       for (const hook of hooks) {
-        if ((yield call(runHook, hook())) === false) {
-          prevented = true;
-          break;
+        // TODO: check returned hooks and location
+        const ret = yield call(runRouteAction, hook(), [], [], undefined, channel, true);
+        console.log('done leaving hooks', ret);
+        if (ret.prevented === true) {
+          return {
+            prevented: true,     // Prevented in leaving hooks
+            hooks,               // Keep current leaving hooks
+            location: undefined, // No location change
+          };
         }
-      }
-
-      if (prevented) {
-        return {
-          prevented: true,     // Prevented in leaving hooks
-          hooks,               // Keep current leaving hooks
-          location: undefined, // No location change
-        };
       }
 
       // Set new leaving hooks
@@ -118,7 +105,7 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
 
         if (typeof cancel === 'function') {
           // Run cancel hook. Ignore even if prevented
-          yield call(runHook, cancel());
+          yield call(runRouteAction, cancel(), [], [], undefined, channel, true);
         }
 
         return {

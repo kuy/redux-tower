@@ -262,14 +262,7 @@ test('theControlTower - leaving hooks', t => {
   t.true(isChannel(ret.value.TAKE.channel));
 
   // Go to '/'
-  ret = sagas[0].next({ pathname: '/', search: '' });
-  t.deepEqual(ret.value.PUT, {
-    channel: null,
-    action: {
-      type: '@@redux-tower/UPDATE_PATH_INFO',
-      payload: { path: "/", params: {}, query: {}, splats: [], route: "/" }
-    },
-  });
+  sagas[0].next({ pathname: '/', search: '' });
 
   // Run main action
   ret = sagas[0].next();
@@ -278,10 +271,10 @@ test('theControlTower - leaving hooks', t => {
 
   // Run leaving hook
   ret = sagas[1].next();
-  t.is(ret.value.CALL.fn, saga.runHook);
-  sagas.push(saga.runHook(...ret.value.CALL.args));
+  t.is(ret.value.CALL.fn, saga.runRouteAction);
+  sagas.push(saga.runRouteAction(...ret.value.CALL.args));
 
-  // Dirty check
+  // Do dirty check
   ret = sagas[2].next();
   t.deepEqual(ret, {
     value: { '@@redux-saga/IO': true, SELECT: { selector: isDirty, args: [] } },
@@ -290,12 +283,12 @@ test('theControlTower - leaving hooks', t => {
 
   // Prevented in leaving hook
   ret = sagas[2].next(true); // result of isDirty
-  t.deepEqual(ret, { value: false, done: true });
+  t.deepEqual(ret, { value: { prevented: true, hooks: [], location: undefined }, done: true });
 
   sagas.pop();
 
   // Done leaving hook, back to Tower
-  ret = sagas[1].next(false);
+  ret = sagas[1].next(ret.value);
   t.deepEqual(ret, { value: { prevented: true, hooks: [leave], location: undefined }, done: true });
 
   sagas.pop();
@@ -305,14 +298,7 @@ test('theControlTower - leaving hooks', t => {
   t.true(isChannel(ret.value.TAKE.channel));
 
   // Go to '/' (try again)
-  ret = sagas[0].next({ pathname: '/', search: '' });
-  t.deepEqual(ret.value.PUT, {
-    channel: null,
-    action: {
-      type: '@@redux-tower/UPDATE_PATH_INFO',
-      payload: { path: "/", params: {}, query: {}, splats: [], route: "/" }
-    },
-  });
+  sagas[0].next({ pathname: '/', search: '' });
 
   // Run main action
   ret = sagas[0].next();
@@ -321,25 +307,24 @@ test('theControlTower - leaving hooks', t => {
 
   // Run leaving hook
   ret = sagas[1].next();
-  t.is(ret.value.CALL.fn, saga.runHook);
-  sagas.push(saga.runHook(...ret.value.CALL.args));
+  t.is(ret.value.CALL.fn, saga.runRouteAction);
+  sagas.push(saga.runRouteAction(...ret.value.CALL.args));
 
-  // Dirty check
+  // Do dirty check
   ret = sagas[2].next();
   t.deepEqual(ret, {
     value: { '@@redux-saga/IO': true, SELECT: { selector: isDirty, args: [] } },
     done: false
   });
 
-  // Prevented in leaving hook
   // Done leaving hook, back to main action
   ret = sagas[2].next(false); // result of isDirty
-  t.deepEqual(ret, { value: true, done: true });
+  t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
 
   sagas.pop();
 
   // Show Index page
-  ret = sagas[1].next(true);
+  ret = sagas[1].next(ret.value);
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
@@ -349,7 +334,7 @@ test('theControlTower - leaving hooks', t => {
   });
 
   // Done main action, back to Tower
-  ret = sagas[1].next(true);
+  ret = sagas[1].next();
   t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
 
   sagas.pop();
@@ -395,8 +380,8 @@ test('theControlTower - cancel hook', async t => {
 
   // Run cancel hook
   ret = sagas[1].next({ loc: val });
-  t.is(ret.value.CALL.fn, saga.runHook);
-  sagas.push(saga.runHook(...ret.value.CALL.args));
+  t.is(ret.value.CALL.fn, saga.runRouteAction);
+  sagas.push(saga.runRouteAction(...ret.value.CALL.args));
 
   // Dispatch something from cancel hook
   ret = sagas[2].next();
@@ -409,7 +394,7 @@ test('theControlTower - cancel hook', async t => {
 
   // Done cancel hook, back to runRouteAction
   ret = sagas[2].next();
-  t.deepEqual(ret, { value: true, done: true });
+  t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
 
   sagas.pop();
 
