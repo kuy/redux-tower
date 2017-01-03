@@ -146,7 +146,7 @@ For increasing readability and productivity, redux-tower allows you to use a sho
 The URL pattern is a plain string, but is able to capture a part of URL and captured values are passed to a route action as named parameters.
 
 ```js
-import { actions, ERROR } from 'redux-tower';
+import { actions, CANCEL, ERROR } from 'redux-tower';
 import Home from '../path/to/home';
 
 const routes = {
@@ -190,6 +190,11 @@ const routes = {
 
   // Default error page (Optional)
   [ERROR]: NotFound,
+
+  // Global cancel action (Optional)
+  [CANCEL]: function* cancel() {
+    yield call(cancelFetch);
+  }
 };
 ```
 
@@ -264,7 +269,6 @@ Don't forget to pass the option when you fork. Here is a list of options.
 + history: An instance of `createBrowserHistory()` or `createHashHistory()`.
 + routes: A route definition that previously introduced.
 * initial: [Optional] Initial component, which is used until a first location change is occurred.
-* cancel: [Optional] A saga, which is called when a running route action was cancelled by other route actions.
 * offset: [Optional] A offset path for `createBrowserHistory()`. No need to use for `createHashHistory()`.
 
 ```js

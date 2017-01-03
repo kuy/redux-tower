@@ -1,7 +1,7 @@
 // @flow
 
 import { put, call, fork, take, select } from 'redux-saga/effects';
-import { createBrowserHistory, saga as router, ERROR } from '../../../src/index';
+import { createBrowserHistory, saga as router, CANCEL, ERROR } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
 import {
   SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST,
@@ -103,14 +103,13 @@ const routes = {
   }],
   '/about': About,
   [ERROR]: NotFound,
+  [CANCEL]: function* cancel() {
+    yield put(cancelFetchPosts());
+  }
 };
-
-function* cancel() {
-  yield put(cancelFetchPosts());
-}
 
 export default function* routesSaga(): Generator<IOEffect,void,*> {
   const offset = '/blog';
   const history = createBrowserHistory();
-  yield fork(router, { history, routes, initial: Loading, cancel, offset });
+  yield fork(router, { history, routes, initial: Loading, offset });
 }

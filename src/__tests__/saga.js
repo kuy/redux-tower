@@ -4,7 +4,7 @@ import { put, select, call } from 'redux-saga/effects';
 import { createMemoryHistory } from 'history';
 import * as saga from '../saga';
 import * as actions from '../actions';
-import { ERROR } from '../preprocess';
+import { ERROR, CANCEL } from '../preprocess';
 
 function isChannel(obj) {
   return typeof obj.take === 'function'
@@ -21,12 +21,9 @@ class NotFound extends Component {}
 
 function createTower(routes) {
   const offset = '';
-  const cancel = function* () {
-    yield put({ type: 'CANCEL' });
-  };
   const matcher = saga.createMatcher(routes);
   const history = createMemoryHistory();
-  return { tower: saga.theControlTower({ history, matcher, offset, cancel }), history, cancel };
+  return { tower: saga.theControlTower({ history, matcher, offset }), history };
 }
 
 test('theControlTower - basic', t => {
@@ -34,7 +31,7 @@ test('theControlTower - basic', t => {
     '/': Index,
     '/hoge': Hoge,
   };
-  const { tower, cancel } = createTower(routes);
+  const { tower } = createTower(routes);
   const sagas = [tower];
 
   let ret = sagas[0].next();
@@ -64,7 +61,6 @@ test('theControlTower - basic', t => {
   t.is(typeof args[0]._invoke, 'function');
   t.deepEqual(args[1], []);
   t.deepEqual(args[2], []);
-  t.is(args[3], cancel);
   t.true(isChannel(args[4]));
 
   // Run main action
@@ -350,14 +346,18 @@ test('theControlTower - leaving hooks', t => {
 
 test('theControlTower - cancel hook', async t => {
   const api = () => {};
+  function* cancel() {
+    yield put({ type: 'CANCEL' });
+  }
   const routes = {
     '/': function* index() {
       yield call(api);
       yield Index;
     },
     '/hoge': Hoge,
+    [CANCEL]: cancel,
   };
-  const { tower, history, cancel } = createTower(routes);
+  const { tower, history } = createTower(routes);
   const sagas = [tower];
 
   // Run main action

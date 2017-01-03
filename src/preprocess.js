@@ -5,6 +5,13 @@ import { isReactComponent } from './utils';
 export const ERROR = `${PREFIX}ERROR`;
 export const ROUTES = `${PREFIX}ROUTES`;
 
+export const CANCEL = `${PREFIX}CANCEL`;
+export const getCancelAction = matcher => {
+  if (matcher[ROUTES][CANCEL]) {
+    return matcher[ROUTES][CANCEL][1];
+  }
+};
+
 function createRouteAction(Component) {
   const name = `generated${Component.displayName || 'Unknown'}Component`;
   const action = {
