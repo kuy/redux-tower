@@ -296,7 +296,8 @@ test('interpolate - more nested', t => {
   });
 });
 
-test('resolve', t => {
+test.only('resolve', t => {
+  // Basic
   let routes = {
     '/': [[], 1, []],
     '/a': [['ENTER-A'], '/a/b', ['LEAVE-B']],
@@ -322,6 +323,33 @@ test('resolve', t => {
     '/a': [['ENTER-A'], 2, ['LEAVE-B']],
     '/a/b': [['ENTER-A'], 2, ['LEAVE-B']],
   });
+
+  // Lazy redirection
+  routes = {
+    '/posts/:id': [[], 1, []],
+    '/about': [[], '/posts/8', []],
+  };
+  resolve(routes);
+  t.deepEqual(routes['/posts/:id'], [[], 1, []]);
+  t.deepEqual(routes['/about'][0], []);
+  t.is(routes['/about'][1].name, 'lazyRedirectAction');
+  t.deepEqual(routes['/about'][2], []);
+
+  let i = routes['/about'][1]();
+  let ret = i.next();
+  t.deepEqual(ret, {
+    value: {
+      '@@redux-saga/IO': true,
+      PUT: {
+        channel: null,
+        action: { type: '@@redux-tower/REPLACE', payload: ['/posts/8'] },
+      }
+    },
+    done: false
+  });
+
+  ret = i.next();
+  t.deepEqual(ret, { value: undefined, done: true });
 
   // Check errors
   routes = {

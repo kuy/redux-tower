@@ -102,7 +102,7 @@ const routes = {
       console.log('admin posts leave hook');
     }],
   }],
-  '/about': About,
+  '/about': '/posts/5',
   [ERROR]: NotFound,
   [CANCEL]: function* cancel() {
     yield put(cancelFetchPosts());

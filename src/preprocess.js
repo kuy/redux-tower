@@ -1,5 +1,5 @@
 import { put } from 'redux-saga/effects';
-import { changeComponent, isPrefixed, PREFIX } from './actions';
+import { replace, changeComponent, isPrefixed, PREFIX } from './actions';
 import { isReactComponent } from './utils';
 
 export const ROUTES = `${PREFIX}ROUTES`;
@@ -16,13 +16,15 @@ export const getConfigurationActions = matcher => {
 };
 
 function createRouteAction(Component) {
-  const name = `generated${Component.displayName || 'Unknown'}Component`;
-  const action = {
-    [name]: function* componentRouteAction() {
-      yield put(changeComponent(Component));
-    }
+  return function* componentRouteAction() {
+    yield put(changeComponent(Component));
   };
-  return action[name];
+}
+
+function createLazyRedirectAction(path) {
+  return function* lazyRedirectAction() {
+    yield put(replace(path));
+  };
 }
 
 const MAX_REDIRECTIONS = 10;
@@ -37,9 +39,14 @@ export function resolve(routes) {
         throw new Error(`Potential for circular reference in '${path}'`);
       }
 
-      const [enter, action, leave] = routes[current];
+      let actions = routes[current];
+      if (typeof actions === 'undefined') {
+        actions = [[], createLazyRedirectAction(current), []];
+      }
+
+      const [enter, action, leave] = actions;
       if (typeof action !== 'string') {
-        routes[path] = routes[current];
+        routes[path] = actions;
         break;
       }
 
