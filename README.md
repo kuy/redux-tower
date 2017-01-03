@@ -1,5 +1,6 @@
 [![NPM Package][npm_img]][npm_site]
 [![Travis][ci_img]][ci_site]
+[![Coverage Status][ca_img]][ca_site]
 [![Dependency Status][david_img]][david_site]
 
 # redux-tower
@@ -385,5 +386,7 @@ Yuki Kodama / [@kuy](https://twitter.com/kuy)
 [npm_site]: https://www.npmjs.org/package/redux-tower
 [ci_img]: https://img.shields.io/travis/kuy/redux-tower/master.svg?style=flat-square
 [ci_site]: https://travis-ci.org/kuy/redux-tower
+[ca_img]: https://coveralls.io/repos/github/kuy/redux-tower/badge.svg?branch=master
+[ca_site]: https://coveralls.io/github/kuy/redux-tower?branch=master
 [david_img]: https://img.shields.io/david/kuy/redux-tower.svg
 [david_site]: https://david-dm.org/kuy/redux-tower
