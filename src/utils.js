@@ -1,4 +1,5 @@
 import qs from 'querystring';
+import { PUSH, REPLACE, CHANGE_COMPONENT } from './actions';
 
 export function normOffset(offset) {
   if (typeof offset === 'undefined') return;
@@ -40,4 +41,18 @@ export function toCamelCase(SNAKE_CASE) {
 
 export function isReactComponent(func) {
   return func.prototype && typeof func.prototype.isReactComponent !== 'undefined';
+}
+
+// https://redux-saga.github.io/redux-saga/docs/api/index.html#blocking--nonblocking
+const EFFECT_TYPES = ['TAKE', 'CALL', 'APPLY', 'CPS', 'JOIN', 'CANCEL', 'FLUSH', 'CANCELLED', 'RACE'];
+export function isBlock(effect) {
+  return EFFECT_TYPES.map(type => !!effect[type]).reduce((p, c) => p || c, false);
+}
+
+export function isPut(effect, type) {
+  return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === type);
+}
+
+export function isPrevent(e) {
+  return isPut(e, CHANGE_COMPONENT) || isPut(e, PUSH) || isPut(e, REPLACE);
 }

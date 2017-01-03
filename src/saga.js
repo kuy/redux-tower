@@ -5,7 +5,10 @@ import {
   intercepted, unprefix, init, updatePathInfo, push, replace, changeComponent,
   PUSH, REPLACE, CHANGE_COMPONENT, HISTORY_ACTIONS
 } from './actions';
-import { parseQueryString, normOffset, removeOffset, toCamelCase, isReactComponent } from './utils';
+import {
+  parseQueryString, normOffset, removeOffset, toCamelCase,
+  isReactComponent, isBlock, isPut, isPrevent
+} from './utils';
 import preprocess, { ERROR, ROUTES } from './preprocess';
 import { getOffset } from './reducer';
 
@@ -28,20 +31,6 @@ function createLocationChannel(history) {
     });
     return unlisten;
   }, buffers.expanding());
-}
-
-// https://redux-saga.github.io/redux-saga/docs/api/index.html#blocking--nonblocking
-const EFFECT_TYPES = ['TAKE', 'CALL', 'APPLY', 'CPS', 'JOIN', 'CANCEL', 'FLUSH', 'CANCELLED', 'RACE'];
-function isBlock(effect) {
-  return EFFECT_TYPES.map(type => !!effect[type]).reduce((p, c) => p || c, false);
-}
-
-function isPut(effect, type) {
-  return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === type);
-}
-
-function isPrevent(e) {
-  return isPut(e, CHANGE_COMPONENT) || isPut(e, PUSH) || isPut(e, REPLACE);
 }
 
 // hooks: Stored current leaving hooks
