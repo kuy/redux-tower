@@ -122,7 +122,7 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
     }
 
     if (asHook && isPrevent(effect)) {
-      console.log('prevent effect is yielded', effect);
+      console.log('prevent effect is yielded in hooks');
       return {
         prevented: true,     // Prevented in entering hooks
         hooks,               // Keep current leaving hooks
@@ -186,16 +186,13 @@ export function* theControlTower({ history, matcher, offset, cancel }) {
     }
 
     console.log('actions', entering, action, leaving);
-    console.log('typeof action', typeof action);
 
     // Clear for detecting location change while running action
     location = undefined;
 
     for (const fn of [...entering, action]) {
       const [iterator, asHook] = fn === action ? [fn(args), false] : [fn(), true];
-      console.log('before', iterator, asHook);
       const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channel, asHook);
-      console.log('ret runRouteAction', ret);
       hooks = ret.hooks;
       if (ret.location) {
         location = ret.location;
