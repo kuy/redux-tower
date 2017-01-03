@@ -1,7 +1,7 @@
 // @flow
 
 import { put, call, fork, take, select } from 'redux-saga/effects';
-import { createBrowserHistory, saga as router, CANCEL, ERROR } from '../../../src/index';
+import { createBrowserHistory, saga as router, CANCEL, ERROR, INITIAL } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
 import {
   SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST,
@@ -25,6 +25,7 @@ import NotFound from '../pages/not-found';
 import type { IOEffect } from 'redux-saga/effects';
 
 const routes = {
+  [INITIAL]: Loading,
   '/': '/posts',
   '/posts': {
     '/': function* postsIndexPage({ query }) {
@@ -111,5 +112,5 @@ const routes = {
 export default function* routesSaga(): Generator<IOEffect,void,*> {
   const offset = '/blog';
   const history = createBrowserHistory();
-  yield fork(router, { history, routes, initial: Loading, offset });
+  yield fork(router, { history, routes, offset });
 }

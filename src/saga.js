@@ -9,7 +9,7 @@ import {
   parseQueryString, normOffset, removeOffset, toCamelCase,
   isReactComponent, isBlock, isPut, isPrevent
 } from './utils';
-import preprocess, { ROUTES, getCancelAction, getErrorAction } from './preprocess';
+import preprocess, { ROUTES, getConfigurationActions } from './preprocess';
 import { getOffset } from './reducer';
 
 export function createMatcher(routes) {
@@ -129,12 +129,13 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
 
 // offset: normalized offset
 export function* theControlTower({ history, matcher, offset }) {
-  // Get configuration routes
-  const cancel = getCancelAction(matcher);
-  const error = getErrorAction(matcher);
-
-  // Channel to take location changes
+  const { cancel, error, initial } = getConfigurationActions(matcher);
   const channel = createLocationChannel(history);
+
+  // Run initial action
+  if (initial) {
+    yield call(runRouteAction, initial(), [], [], undefined, channel, false);
+  }
 
   // Initial location
   yield put(push(removeOffset(history.location.pathname, offset)));
@@ -196,9 +197,9 @@ export function* theControlTower({ history, matcher, offset }) {
   }
 }
 
-function* handleLocationChange({ history, routes, initial, offset }) {
+function* handleLocationChange({ history, routes, offset }) {
   // Prepare initial state
-  yield put(init({ component: initial, offset }));
+  yield put(init({ offset }));
 
   // Start routing
   const matcher = createMatcher(routes);

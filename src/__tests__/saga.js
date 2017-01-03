@@ -4,7 +4,7 @@ import { put, select, call } from 'redux-saga/effects';
 import { createMemoryHistory } from 'history';
 import * as saga from '../saga';
 import * as actions from '../actions';
-import { ERROR, CANCEL } from '../preprocess';
+import { CANCEL, ERROR, INITIAL } from '../preprocess';
 
 function isChannel(obj) {
   return typeof obj.take === 'function'
@@ -18,6 +18,7 @@ class Hoge extends Component {}
 class Dashboard extends Component {}
 class Edit extends Component {}
 class NotFound extends Component {}
+class Loading extends Component {}
 
 function createTower(routes) {
   const offset = '';
@@ -96,6 +97,44 @@ function moveTo(iterator, pathname) {
   }
   return saga.runRouteAction(...ret.value.CALL.args);
 }
+
+test('theControlTower - initial action', t => {
+  const routes = {
+    '/': Index,
+    [INITIAL]: Loading,
+  };
+  const { tower } = createTower(routes);
+  const sagas = [tower];
+
+  // Run initial action
+  let ret = sagas[0].next();
+  t.is(ret.value.CALL.fn, saga.runRouteAction);
+  sagas.push(saga.runRouteAction(...ret.value.CALL.args));
+
+  // Show Loading page
+  ret = sagas[1].next();
+  t.deepEqual(ret.value.PUT, {
+    channel: null,
+    action: {
+      type: '@@redux-tower/CHANGE_COMPONENT',
+      payload: Loading
+    },
+  });
+
+  // Done main action, back to Tower
+  ret = sagas[1].next();
+  t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
+
+  sagas.pop();
+
+  // Push initial location
+  sagas[0].next();
+
+  // Wait location change
+  ret = sagas[0].next();
+  t.true(isChannel(ret.value.TAKE.channel));
+});
+
 
 test('theControlTower - entering hooks', async t => {
   const isNotLoggedIn = () => {};

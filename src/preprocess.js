@@ -3,12 +3,17 @@ import { changeComponent, isPrefixed, PREFIX } from './actions';
 import { isReactComponent } from './utils';
 
 export const ROUTES = `${PREFIX}ROUTES`;
-
-export const ERROR = `${PREFIX}ERROR`;
-export const getErrorAction = matcher => matcher[ROUTES][ERROR];
-
 export const CANCEL = `${PREFIX}CANCEL`;
-export const getCancelAction = matcher => matcher[ROUTES][CANCEL];
+export const ERROR = `${PREFIX}ERROR`;
+export const INITIAL = `${PREFIX}INITIAL`;
+
+export const getConfigurationActions = matcher => {
+  return {
+    cancel: matcher[ROUTES][CANCEL],
+    error: matcher[ROUTES][ERROR],
+    initial: matcher[ROUTES][INITIAL],
+  };
+};
 
 function createRouteAction(Component) {
   const name = `generated${Component.displayName || 'Unknown'}Component`;
