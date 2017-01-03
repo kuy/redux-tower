@@ -146,7 +146,7 @@ For increasing readability and productivity, redux-tower allows you to use a sho
 The URL pattern is a plain string, but is able to capture a part of URL and captured values are passed to a route action as named parameters.
 
 ```js
-import { actions } from 'redux-tower';
+import { actions, ERROR } from 'redux-tower';
 import Home from '../path/to/home';
 
 const routes = {
@@ -187,6 +187,9 @@ const routes = {
   // Change component
   // Assign React component directly (except Stateless Functional Components)
   '/contact': Contact,
+
+  // Default error page (Optional)
+  [ERROR]: NotFound,
 };
 ```
 
