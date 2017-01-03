@@ -3,6 +3,9 @@
     "react", "es2015", "es2016", "stage-2"
   ],
   "env": {
+    "development": {
+      "sourceMaps": "inline"
+    },
     "production": {
       "plugins": [
         "babel-plugin-unassert",

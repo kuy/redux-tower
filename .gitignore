@@ -2,3 +2,5 @@ node_modules
 *.log
 build
 lib
+coverage
+.nyc_output

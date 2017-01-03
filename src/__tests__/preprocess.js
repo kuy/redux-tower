@@ -296,7 +296,7 @@ test('interpolate - more nested', t => {
   });
 });
 
-test.only('resolve', t => {
+test('resolve', t => {
   // Basic
   let routes = {
     '/': [[], 1, []],
