@@ -1,7 +1,7 @@
 // @flow
 
 import { put, call, fork, take, select } from 'redux-saga/effects';
-import { createBrowserHistory, saga as router } from '../../../src/index';
+import { createBrowserHistory, saga as router, ERROR } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
 import {
   SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST,
@@ -15,11 +15,12 @@ import { isLoggedIn, isDirty } from '../reducers';
 import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
 import About from '../pages/about';
-import Loading from '../pages/loading';
 import UsersLogin from '../pages/users/login';
 import AdminPostsIndex from '../pages/admin/posts/index';
 import AdminPostsNew from '../pages/admin/posts/new';
 import AdminPostsEdit from '../pages/admin/posts/edit';
+import Loading from '../pages/loading';
+import NotFound from '../pages/not-found';
 
 import type { IOEffect } from 'redux-saga/effects';
 
@@ -101,6 +102,7 @@ const routes = {
     }],
   }],
   '/about': About,
+  [ERROR]: NotFound,
 };
 
 function* cancel() {

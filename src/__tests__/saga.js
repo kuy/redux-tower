@@ -4,6 +4,7 @@ import { put, select, call } from 'redux-saga/effects';
 import { createMemoryHistory } from 'history';
 import * as saga from '../saga';
 import * as actions from '../actions';
+import { ERROR } from '../preprocess';
 
 function isChannel(obj) {
   return typeof obj.take === 'function'
@@ -16,6 +17,7 @@ class Login extends Component {}
 class Hoge extends Component {}
 class Dashboard extends Component {}
 class Edit extends Component {}
+class NotFound extends Component {}
 
 function createTower(routes) {
   const offset = '';
@@ -93,7 +95,9 @@ function moveTo(iterator, pathname) {
   let ret = iterator.next();
   ret = iterator.next();
   ret = iterator.next({ pathname, search: '' });
-  ret = iterator.next();
+  if (ret.value.PUT) {
+    ret = iterator.next();
+  }
   return saga.runRouteAction(...ret.value.CALL.args);
 }
 
@@ -436,5 +440,52 @@ test('theControlTower - cancel hook', async t => {
 
   // Wait location change
   ret = sagas[0].next(ret.value);
+  t.true(isChannel(ret.value.TAKE.channel));
+});
+
+test('theControlTower - error page', t => {
+  const routes = {
+    '/': Index,
+    [ERROR]: NotFound,
+  };
+  const { tower } = createTower(routes);
+  const sagas = [tower];
+
+  // Run main action
+  sagas.push(moveTo(sagas[0], '/not/exists/page'));
+
+  // Show Error page
+  let ret = sagas[1].next();
+  t.deepEqual(ret.value.PUT, {
+    channel: null,
+    action: {
+      type: '@@redux-tower/CHANGE_COMPONENT',
+      payload: NotFound
+    },
+  });
+
+  // Done main action, back to Tower
+  ret = sagas[1].next();
+  t.deepEqual(ret, { value: { prevented: false, hooks: [], location: undefined }, done: true });
+
+  sagas.pop();
+
+  // Wait location change
+  ret = sagas[0].next(ret.value);
+  t.true(isChannel(ret.value.TAKE.channel));
+});
+
+test('theControlTower - no error page', t => {
+  const routes = {
+    '/': Index,
+  };
+  const { tower } = createTower(routes);
+  const sagas = [tower];
+
+  // No matched route and No Error page
+  // Wait location change
+  let ret = sagas[0].next();
+  ret = sagas[0].next();
+  ret = sagas[0].next({ pathname: '/not/exists/page', search: '' });
   t.true(isChannel(ret.value.TAKE.channel));
 });

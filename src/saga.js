@@ -6,7 +6,7 @@ import {
   PUSH, REPLACE, CHANGE_COMPONENT, HISTORY_ACTIONS
 } from './actions';
 import { parseQueryString, normOffset, removeOffset, toCamelCase, isReactComponent } from './utils';
-import preprocess from './preprocess';
+import preprocess, { ERROR, ROUTES } from './preprocess';
 import { getOffset } from './reducer';
 
 export function createMatcher(routes) {
@@ -16,6 +16,7 @@ export function createMatcher(routes) {
     const action = routes[path];
     matcher.addRoute(path, action);
   }
+  matcher[ROUTES] = routes;
   return matcher;
 }
 
@@ -151,38 +152,50 @@ export function* theControlTower({ history, matcher, offset, cancel }) {
       location = yield take(channel);
     }
 
+    let entering, action, leaving, args;
+
     const pathname = removeOffset(location.pathname, offset);
     const matched = matcher.match(pathname);
-    if (!matched) {
-      console.error(`No matched route: ${pathname} (original='${location.pathname}', offset='${offset}')`);
-      location = undefined; // Clear to prevent infinite loop
-      continue;
+    if (matched) {
+      console.log('matched', matched);
+
+      const { action: actions, params, route, splats } = matched;
+      args = {
+        path: pathname,
+        params,
+        query: parseQueryString(location.search),
+        splats,
+        route,
+      };
+
+      yield put(updatePathInfo(args));
+
+      [entering, action, leaving] = actions;
+    } else {
+      console.log('matched', '[no matched route]');
+
+      if (!matcher[ROUTES][ERROR]) {
+        console.error(`No matched route and error page: ${pathname} (original='${location.pathname}', offset='${offset}')`);
+        location = undefined; // Clear to prevent infinite loop
+        continue;
+      }
+
+      // Fallback to error page
+      args = {};
+      [entering, action, leaving] = matcher[ROUTES][ERROR];
     }
 
-    console.log('matched', matched);
-
-    const { action: actions, params, route, splats } = matched;
-    console.log('actions', actions);
-    const args = {
-      path: pathname,
-      params,
-      query: parseQueryString(location.search),
-      splats,
-      route,
-    };
-
-    yield put(updatePathInfo(args));
+    console.log('actions', entering, action, leaving);
+    console.log('typeof action', typeof action);
 
     // Clear for detecting location change while running action
     location = undefined;
 
-    const [entering, action, leaving] = actions;
-
-    // XXX: Thanks to the power of generator function, I can check that
-    // these sagas may change a component or not without running them.
     for (const fn of [...entering, action]) {
       const [iterator, asHook] = fn === action ? [fn(args), false] : [fn(), true];
+      console.log('before', iterator, asHook);
       const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channel, asHook);
+      console.log('ret runRouteAction', ret);
       hooks = ret.hooks;
       if (ret.location) {
         location = ret.location;

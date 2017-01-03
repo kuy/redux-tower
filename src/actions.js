@@ -1,4 +1,4 @@
-const PREFIX = '@@redux-tower/';
+export const PREFIX = '@@redux-tower/';
 
 export const INTERCEPTED = `${PREFIX}INTERCEPTED`;
 export const intercepted = action => ({ ...action, [INTERCEPTED]: true });

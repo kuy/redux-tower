@@ -1,6 +1,9 @@
 import { put } from 'redux-saga/effects';
-import { changeComponent } from './actions';
+import { changeComponent, PREFIX } from './actions';
 import { isReactComponent } from './utils';
+
+export const ERROR = `${PREFIX}ERROR`;
+export const ROUTES = `${PREFIX}ROUTES`;
 
 function createRouteAction(Component) {
   const name = `generated${Component.displayName || 'Unknown'}Component`;

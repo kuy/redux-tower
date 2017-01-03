@@ -35,6 +35,7 @@ class Layout extends Component {
             </Menu.Item>
             <Menu.Item><Link to='/'>Home</Link></Menu.Item>
             <Menu.Item><Link to='/posts'>Posts</Link></Menu.Item>
+            <Menu.Item><Link to='/contact'>Contact</Link></Menu.Item>
             <Menu.Item><Link to='/about'>About</Link></Menu.Item>
             <Menu.Menu position='right'>
               {auth}
