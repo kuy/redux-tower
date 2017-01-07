@@ -10,7 +10,7 @@ function* searchWithDelay({ payload: action }) {
   yield put(action);
 }
 
-function* handleSearch() {
+function* handleSearch(): Generator<IOEffect,void,*> {
   yield takeLatest(REQUEST_SEARCH, searchWithDelay);
 }
 

@@ -1,12 +1,13 @@
 // @flow
 
 import { createAction } from 'redux-actions';
-import type { ActionCreator } from 'redux';
+import type { ActionCreator as ActionCreatorBase } from 'redux';
 
 export type ActionType =
   | 'REQUEST_FETCH_POSTS' | 'SUCCESS_FETCH_POSTS' | 'FAILURE_FETCH_POSTS' | 'CANCEL_FETCH_POSTS'
   | 'REQUEST_CREATE_POST' | 'SUCCESS_CREATE_POST' | 'FAILURE_CREATE_POST' | 'CANCEL_CREATE_POST'
   | 'REQUEST_STORE_POST' | 'SUCCESS_STORE_POST' | 'FAILURE_STORE_POST' | 'CANCEL_STORE_POST'
+  | 'REQUEST_DELETE_POST' | 'SUCCESS_DELETE_POST' | 'FAILURE_DELETE_POST' | 'CANCEL_DELETE_POST'
   | 'REQUEST_SEARCH'
   | 'REQUEST_LOGIN' | 'SUCCESS_LOGIN' | 'FAILURE_LOGIN'
   | 'REQUEST_LOGOUT' | 'SUCCESS_LOGOUT' | 'FAILURE_LOGOUT'
@@ -17,6 +18,8 @@ export type Action = {
   payload: any,
   meta?: any,
 };
+
+export type ActionCreator = ActionCreatorBase<Action, ActionType>;
 
 export const REQUEST_FETCH_POSTS: ActionType = 'REQUEST_FETCH_POSTS';
 export const SUCCESS_FETCH_POSTS: ActionType = 'SUCCESS_FETCH_POSTS';

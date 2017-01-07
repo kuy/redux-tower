@@ -64,11 +64,12 @@ type PostsResponse = {
 
 type AuthResponse =
   | { data: { username: string } }
+  | { data: boolean }
   | { error: any };
 
 type Response = PostsResponse | AuthResponse;
 
-function response(data): Promise<Response> {
+function response(data: Response): Promise<Response> {
   return new Promise(resolve => {
     // Fake delay :)
     setTimeout(() => {

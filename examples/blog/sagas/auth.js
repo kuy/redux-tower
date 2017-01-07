@@ -9,7 +9,7 @@ import {
 import * as api from '../api';
 import type { IOEffect } from 'redux-saga/effects';
 
-function* handleLogin() {
+function* handleLogin(): Generator<IOEffect,void,*> {
   while (true) {
     const { payload } = yield take(REQUEST_LOGIN);
     const { data, error } = yield call(api.auth.login, payload);
@@ -21,7 +21,7 @@ function* handleLogin() {
   }
 }
 
-function* handleLogout() {
+function* handleLogout(): Generator<IOEffect,void,*> {
   while (true) {
     const { payload } = yield take(REQUEST_LOGOUT);
     const { data, error } = yield call(api.auth.logout);

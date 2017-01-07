@@ -14,7 +14,11 @@ import type { PostId, Post } from './api';
 type StatusType = 'ready' | 'working';
 type StatusState = { status: StatusType, error: boolean };
 type AppState = StatusState & { login: ?string };
-type PostsState = StatusState & { list: Array<PostId>, entities: { [PostId]: Post } };
+type PostsState = StatusState & {
+  list: Array<PostId>,
+  entities: { [PostId]: Post },
+  dirty: boolean
+};
 
 export type State = {
   app: AppState,
@@ -36,8 +40,8 @@ const initial: State = {
   },
 };
 
-export const isLoggedIn = state => typeof state.app.login !== 'undefined';
-export const isDirty = state => state.posts.dirty;
+export const isLoggedIn = (state: State) => typeof state.app.login !== 'undefined';
+export const isDirty = (state: State) => state.posts.dirty;
 
 function app(state: AppState = initial.app, { type, payload }: Action): AppState {
   switch (type) {
