@@ -30,6 +30,7 @@
     "prepublish": "npm run clean && npm run build"
   },
   "dependencies": {
+    "domain-specific-saga": "^0.0.1",
     "history": "^4.5.0",
     "querystring": "^0.2.0",
     "ruta3": "^2.0.1"

@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { eventChannel, buffers } from 'redux-saga';
 import { call, fork, put, select, take, race } from 'redux-saga/effects';
+import transform from 'domain-specific-saga';
 import ruta3 from 'ruta3';
 import {
   intercepted, unprefix, init, updatePathInfo, push, replace, changeComponent,
@@ -32,21 +33,6 @@ function createLocationChannel(history) {
     });
     return unlisten;
   }, buffers.expanding());
-}
-
-export function* transform(iterator, rules = []) {
-  let ret;
-  while (true) {
-    let { value, done } = iterator.next(ret);
-    if (done) {
-      return value;
-    }
-
-    value = rules.reduce((p, t) => t(p), value);
-    ret = yield value;
-  }
-
-  assert(false, "Something wrong, shouldn't be reached here.");
 }
 
 // hooks: Stored current leaving hooks
