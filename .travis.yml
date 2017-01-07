@@ -10,5 +10,9 @@ script:
   - npm run test
   - npm run build
 
+dist: trusty
+sudo: false
+cache: yarn
+
 after_success:
   - './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
