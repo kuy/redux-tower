@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { eventChannel, buffers } from 'redux-saga';
 import { call, fork, put, select, take, race } from 'redux-saga/effects';
 import ruta3 from 'ruta3';
@@ -33,9 +34,31 @@ function createLocationChannel(history) {
   }, buffers.expanding());
 }
 
+export function* transform(iterator, rules = []) {
+  let ret;
+  while (true) {
+    let { value, done } = iterator.next(ret);
+    if (done) {
+      return value;
+    }
+
+    value = rules.reduce((p, t) => t(p), value);
+    ret = yield value;
+  }
+
+  assert(false, "Something wrong, shouldn't be reached here.");
+}
+
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
 export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asHook) {
+  // Setup Domain Specific Saga
+  const rules = [
+    value => typeof value === 'string' ? put(replace(value)) : value,
+    value => isReactComponent(value) ? put(changeComponent(value)) : value,
+  ];
+  iterator = transform(iterator, rules);
+
   let ret;
   while (true) {
     let { value: effect, done } = iterator.next(ret);
@@ -49,16 +72,6 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
         hooks,               // Keep current leaving hooks
         location: undefined, // No location change
       };
-    }
-
-    if (typeof effect === 'string') {
-      console.log('convert to replace');
-      effect = put(replace(effect));
-    }
-
-    if (isReactComponent(effect)) {
-      console.log('convert to changeComponent');
-      effect = put(changeComponent(effect));
     }
 
     if (isPut(effect, CHANGE_COMPONENT)) {
