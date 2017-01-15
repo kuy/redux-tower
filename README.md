@@ -335,7 +335,7 @@ I'm happy to hear feature requests and merge your PRs if you feel it doesn't sat
 A simple component switcher, which is connected with Redux.
 
 ```js
-import { Router } from 'redux-tower/react';
+import { Router } from 'redux-tower/lib/react';
 
 // ...
 
@@ -351,7 +351,7 @@ document.getElementById('container'));
 `<Link>` component helps you to put a link in your Redux application.
 
 ```js
-import { Link } from 'redux-tower/react';
+import { Link } from 'redux-tower/lib/react';
 
 // ...
 
