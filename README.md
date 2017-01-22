@@ -2,10 +2,9 @@
 [![Travis][ci_img]][ci_site]
 [![Coverage Status][ca_img]][ca_site]
 [![Dependency Status][david_img]][david_site]
+[![Greenkeeper badge](https://badges.greenkeeper.io/kuy/redux-tower.svg)](https://greenkeeper.io/)
 
 # redux-tower
-
-[![Greenkeeper badge](https://badges.greenkeeper.io/kuy/redux-tower.svg)](https://greenkeeper.io/)
 
 [Saga](https://github.com/redux-saga/redux-saga) powered routing engine for [Redux](http://redux.js.org/) apps.
 
