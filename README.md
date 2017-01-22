@@ -5,6 +5,8 @@
 
 # redux-tower
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kuy/redux-tower.svg)](https://greenkeeper.io/)
+
 [Saga](https://github.com/redux-saga/redux-saga) powered routing engine for [Redux](http://redux.js.org/) apps.
 
 redux-tower provides a way to fully control client-side routing with its related side effects
