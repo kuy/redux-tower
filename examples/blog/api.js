@@ -95,10 +95,10 @@ export const posts = {
     // Enumerate id of condidate pages
     let ids;
     if (typeof q !== 'undefined') {
-      q = q.toLowerCase();
+      const tempQuery: string = q.toLowerCase();
       ids = POSTS.list
         .map(id => POSTS.entities[id])
-        .filter(post => post.title.toLowerCase().indexOf(q) !== -1)
+        .filter(post => post.title.toLowerCase().indexOf(tempQuery) !== -1)
         .map(post => post.id);
     } else {
       ids = POSTS.list;

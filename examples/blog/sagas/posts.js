@@ -61,7 +61,7 @@ function* deletePost({ payload }: Action) {
   }
 }
 
-export default function* postsSaga(): Generator<IOEffect,void,*> {
+export default function* postsSaga(): Generator<*,void,*> {
   yield takeEvery(REQUEST_CREATE_POST, createPost);
   yield takeEvery(REQUEST_STORE_POST, storePost);
   yield takeEvery(REQUEST_DELETE_POST, deletePost);
