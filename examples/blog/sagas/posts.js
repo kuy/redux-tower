@@ -1,6 +1,7 @@
 // @flow
 
-import { put, call, fork, takeEvery } from 'redux-saga/effects';
+import { put, call, fork } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
 import * as api from '../api';
 import {
   requestFetchPosts, successFetchPosts, failureFetchPosts,
