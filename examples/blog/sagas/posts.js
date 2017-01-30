@@ -1,6 +1,7 @@
 // @flow
 
-import { put, call, fork, takeEvery } from 'redux-saga/effects';
+import { put, call, fork } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
 import * as api from '../api';
 import {
   requestFetchPosts, successFetchPosts, failureFetchPosts,
@@ -60,7 +61,7 @@ function* deletePost({ payload }: Action) {
   }
 }
 
-export default function* postsSaga(): Generator<IOEffect,void,*> {
+export default function* postsSaga(): Generator<*,void,*> {
   yield takeEvery(REQUEST_CREATE_POST, createPost);
   yield takeEvery(REQUEST_STORE_POST, storePost);
   yield takeEvery(REQUEST_DELETE_POST, deletePost);

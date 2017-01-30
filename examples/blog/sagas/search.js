@@ -1,16 +1,23 @@
 // @flow
 
 import { delay } from 'redux-saga';
-import { fork, call, put, takeLatest } from 'redux-saga/effects';
+import { fork, call, put } from 'redux-saga/effects';
+import { takeLatest } from 'redux-saga';
 import { REQUEST_SEARCH } from '../actions';
 import type { IOEffect } from 'redux-saga/effects';
 
-function* searchWithDelay({ payload: action }) {
+type Action = {
+  payload: {
+    type: string;
+  };
+};
+
+function* searchWithDelay({ payload: action }:Action):Generator<*,void,*>{
   yield call(delay, 500);
   yield put(action);
 }
 
-function* handleSearch(): Generator<IOEffect,void,*> {
+function* handleSearch(): Generator<*,void,*> {
   yield takeLatest(REQUEST_SEARCH, searchWithDelay);
 }
 
