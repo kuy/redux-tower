@@ -7,9 +7,9 @@ import { REQUEST_SEARCH } from '../actions';
 import type { IOEffect } from 'redux-saga/effects';
 
 type Action = {
-	payload: {
-		type: string;
-	};
+  payload: {
+    type: string;
+  };
 };
 
 function* searchWithDelay({ payload: action }:Action):Generator<*,void,*>{
