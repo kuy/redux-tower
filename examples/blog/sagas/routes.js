@@ -1,5 +1,6 @@
 // @flow
 
+import React from 'react';
 import { put, call, fork, take, select } from 'redux-saga/effects';
 import { createBrowserHistory, saga as router, CANCEL, ERROR, INITIAL } from '../../../src/index';
 import { loadPosts, loadPost } from './posts';
@@ -25,25 +26,25 @@ import NotFound from '../pages/not-found';
 import type { IOEffect } from 'redux-saga/effects';
 
 const routes = {
-  [INITIAL]: Loading,
+  [INITIAL]: <Loading />,
   '/': '/posts',
   '/posts': {
     '/': function* postsIndexPage({ query }) {
       yield call(loadPosts, query);
-      yield PostsIndex;
+      yield <PostsIndex />;
     },
     '/:id': function* postsShowPage({ params: { id } }) {
       yield call(loadPost, id);
-      yield PostsShow;
+      yield <PostsShow />;
     },
   },
   '/users': {
     '/login': {
-      '/': UsersLogin,
+      '/': <UsersLogin />,
       '/processing': function* usersLoginProcessingAction() {
         const { type } = yield take([SUCCESS_LOGIN, FAILURE_LOGIN]);
         if (type === SUCCESS_LOGIN) {
-          yield Loading;
+          yield <Loading />;
           yield '/admin/posts';
         } else {
           yield '/users/login';
@@ -53,7 +54,7 @@ const routes = {
     '/logout': function* usersLogoutAction() {
       const { type } = yield take([SUCCESS_LOGOUT, FAILURE_LOGOUT]);
       if (type === SUCCESS_LOGOUT) {
-        yield Loading;
+        yield <Loading />;
         yield '/';
       } else {
         // NOTE: Already logged-out?
@@ -72,9 +73,9 @@ const routes = {
       '/': function* adminPostsIndexPage({ query }) {
         query.limit = 10;
         yield call(loadPosts, query);
-        yield AdminPostsIndex;
+        yield <AdminPostsIndex />;
       },
-      '/new': AdminPostsNew,
+      '/new': <AdminPostsNew />,
       '/create': function* adminPostsCreateAction() {
         // FIXME: Routing based on the result
         yield take([SUCCESS_CREATE_POST, FAILURE_CREATE_POST, CANCEL_CREATE_POST]);
@@ -82,7 +83,7 @@ const routes = {
       },
       '/:id/edit': [function* adminPostsEditPage({ params: { id } }) {
         yield call(loadPost, id);
-        yield AdminPostsEdit;
+        yield <AdminPostsEdit />;
       }, function* adminPostsEditLeaveHook() {
         console.log('admin posts edit leave hook');
         if (yield select(isDirty)) yield false;
@@ -103,7 +104,7 @@ const routes = {
     }],
   }],
   '/about': '/posts/5',
-  [ERROR]: NotFound,
+  [ERROR]: <NotFound />,
   [CANCEL]: function* cancel() {
     yield put(cancelFetchPosts());
   }
