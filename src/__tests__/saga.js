@@ -1,5 +1,5 @@
 import test from 'ava';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { put, select, call } from 'redux-saga/effects';
 import { createMemoryHistory } from 'history';
 import * as saga from '../saga';
@@ -29,8 +29,8 @@ function createTower(routes) {
 
 test('theControlTower - basic', t => {
   const routes = {
-    '/': Index,
-    '/hoge': Hoge,
+    '/': <Index />,
+    '/hoge': <Hoge />,
   };
   const { tower } = createTower(routes);
   const sagas = [tower];
@@ -72,8 +72,8 @@ test('theControlTower - basic', t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Hoge
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <Hoge />
     },
   });
 
@@ -100,8 +100,8 @@ function moveTo(iterator, pathname) {
 
 test('theControlTower - initial action', t => {
   const routes = {
-    '/': Index,
-    [INITIAL]: Loading,
+    '/': <Index />,
+    [INITIAL]: <Loading />,
   };
   const { tower } = createTower(routes);
   const sagas = [tower];
@@ -116,8 +116,8 @@ test('theControlTower - initial action', t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Loading
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <Loading />
     },
   });
 
@@ -139,15 +139,15 @@ test('theControlTower - initial action', t => {
 test('theControlTower - entering hooks', async t => {
   const isNotLoggedIn = () => {};
   const routes = {
-    '/': Index,
-    '/login': Login,
+    '/': <Index />,
+    '/login': <Login />,
     '/admin': [function* enter() {
       if (yield select(isNotLoggedIn)) {
         yield '/login'; // Redirect
       }
     }, {
       '/': './dashboard',
-      '/dashboard': Dashboard
+      '/dashboard': <Dashboard />
     }],
   };
   const { tower, history } = createTower(routes);
@@ -199,8 +199,8 @@ test('theControlTower - entering hooks', async t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Login
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <Login />
     },
   });
 
@@ -245,8 +245,8 @@ test('theControlTower - entering hooks', async t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Dashboard
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <Dashboard />
     },
   });
 
@@ -269,9 +269,9 @@ test('theControlTower - leaving hooks', t => {
     }
   }
   const routes = {
-    '/': Index,
+    '/': <Index />,
     '/posts': {
-      '/:id/edit': [Edit, leave]
+      '/:id/edit': [<Edit />, leave]
     },
   };
   const { tower } = createTower(routes);
@@ -285,8 +285,8 @@ test('theControlTower - leaving hooks', t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Edit
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <Edit />
     },
   });
 
@@ -367,8 +367,8 @@ test('theControlTower - leaving hooks', t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Index
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <Index />
     },
   });
 
@@ -391,9 +391,9 @@ test('theControlTower - cancel hook', async t => {
   const routes = {
     '/': function* index() {
       yield call(api);
-      yield Index;
+      yield <Index />;
     },
-    '/hoge': Hoge,
+    '/hoge': <Hoge />,
     [CANCEL]: cancel,
   };
   const { tower, history } = createTower(routes);
@@ -466,8 +466,8 @@ test('theControlTower - cancel hook', async t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: Hoge
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <Hoge />
     },
   });
 
@@ -484,8 +484,8 @@ test('theControlTower - cancel hook', async t => {
 
 test('theControlTower - error page', t => {
   const routes = {
-    '/': Index,
-    [ERROR]: NotFound,
+    '/': <Index />,
+    [ERROR]: <NotFound />,
   };
   const { tower } = createTower(routes);
   const sagas = [tower];
@@ -498,8 +498,8 @@ test('theControlTower - error page', t => {
   t.deepEqual(ret.value.PUT, {
     channel: null,
     action: {
-      type: '@@redux-tower/CHANGE_COMPONENT',
-      payload: NotFound
+      type: '@@redux-tower/CHANGE_ELEMENT',
+      payload: <NotFound />
     },
   });
 
@@ -516,7 +516,7 @@ test('theControlTower - error page', t => {
 
 test('theControlTower - no error page', t => {
   const routes = {
-    '/': Index,
+    '/': <Index />,
   };
   const { tower } = createTower(routes);
   const sagas = [tower];

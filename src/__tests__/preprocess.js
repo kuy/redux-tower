@@ -1,5 +1,7 @@
 import test from 'ava';
-import { Component } from 'react';
+import React, { Component } from 'react';
+import { put } from 'redux-saga/effects';
+import { changeElement } from '../actions.js';
 import preprocess, {
   flatten, interpolate, resolve, resolveRelative, CANCEL, ERROR
 } from '../preprocess';
@@ -9,19 +11,19 @@ class Page extends Component {}
 test('preprocess - flat', t => {
   let routes = {
     '/top': '/home',
-    '/': Page,
+    '/': <Page />,
     '/home': '/',
   };
   let actual = preprocess(routes);
   t.is(actual['/top'], actual['/']);
-  t.true(typeof actual['/'][1].prototype.isReactComponent === 'undefined');
+  t.deepEqual(actual['/'][1]().next().value, put(changeElement(<Page />)));
   t.is(actual['/home'], actual['/']);
 });
 
 test('preprocess - nested', t => {
   const fn = name => () => name;
   let routes = {
-    '/': Page,
+    '/': <Page />,
     '/blog': {
       '/': '../',
       '/home': './',
@@ -42,7 +44,7 @@ test('preprocess - nested', t => {
     '/about': fn('about'),
   };
   let actual = preprocess(routes);
-  t.true(typeof actual['/'][1].prototype.isReactComponent === 'undefined');
+  t.deepEqual(actual['/'][1]().next().value, put(changeElement(<Page />)));
   t.is(actual['/news'][1](), 'posts-index');
   t.is(actual['/about'][1](), 'about');
   t.is(actual['/blog'], actual['/']);
@@ -57,7 +59,7 @@ test('preprocess - nested', t => {
 test('preprocess - ignore configuration routes', t => {
   const fn = name => () => name;
   let routes = {
-    '/': Page,
+    '/': <Page />,
     [CANCEL]: fn('cancel'),
     [ERROR]: fn('error'),
   };
