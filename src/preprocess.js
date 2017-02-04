@@ -1,5 +1,6 @@
+import React from 'react'
 import { put } from 'redux-saga/effects';
-import { replace, changeComponent, isPrefixed, PREFIX } from './actions';
+import { replace, changeElement, isPrefixed, PREFIX } from './actions';
 import { isReactComponent } from './utils';
 
 export const ROUTES = `${PREFIX}ROUTES`;
@@ -15,9 +16,9 @@ export const getConfigurationActions = matcher => {
   };
 };
 
-function createRouteAction(Component) {
-  return function* componentRouteAction() {
-    yield put(changeComponent(Component));
+function createRouteAction(Element) {
+  return function* elementRouteAction() {
+    yield put(changeElement(Element));
   };
 }
 
@@ -59,7 +60,8 @@ export function interpolate(routes, entering = [], leaving = []) {
   const r = {};
   for (const segment of Object.keys(routes)) {
     let rval = routes[segment];
-    if (typeof rval === 'object') { // Array or Object
+    // Array or not React Element Object
+    if (typeof rval === 'object' && !React.isValidElement(rval)) {
       if (!Array.isArray(rval)) {
         rval = [rval];
       }
@@ -92,12 +94,19 @@ export function interpolate(routes, entering = [], leaving = []) {
         throw new Error(`Hooks can be specified with nested routes in '${segment}'`);
       }
 
-      // Normalize recursively
-      r[segment] = interpolate(
-        action,
-        [...entering, enter].filter(h => !!h),
-        [leave, ...leaving].filter(h => !!h)
-      );
+      if (React.isValidElement(action)) {
+        const retEnter = (enter) ? [enter] : entering;
+        const retLeave = (leave) ? [leave] : leaving;
+        r[segment] = [retEnter, action, retLeave];
+      } else {
+        // Normalize recursively
+        r[segment] = interpolate(
+          action,
+          [...entering, enter].filter(h => !!h),
+          [leave, ...leaving].filter(h => !!h)
+        );
+      }
+
     } else {
       // Interpolate hooks
       r[segment] = [entering, rval, leaving];
@@ -161,7 +170,7 @@ export function flatten(routes) {
       const [key, path] = backlog.shift();
       let rval = current[key];
       let action = Array.isArray(rval) ? rval[1] : rval;
-      if (typeof action === 'object') {
+      if (typeof action === 'object' && !React.isValidElement(action)) {
         const base = stack.map(l => l.name).join('') + key;
         stack.push({
           current: action,
@@ -206,10 +215,10 @@ export default function preprocess(routes) {
   // 2. Flatten nested and resolve relative routes
   routes = flatten(routes);
 
-  // 3. Replace React component with auto-generated route actions (sagas)
+  // 3. Replace React element with auto-generated route actions (sagas)
   for (const segment of Object.keys(routes)) {
     const [enter, action, leave] = routes[segment];
-    if (isReactComponent(action)) {
+    if (React.isValidElement(action)) {
       routes[segment] = [enter, createRouteAction(action), leave];
     }
   }

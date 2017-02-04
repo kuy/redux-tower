@@ -16,9 +16,9 @@ export const isIntercepted = action => !!(action && action[INTERCEPTED]);
 export const createActionCreator = type => payload => ({ type, payload });
 
 export const INIT = `${PREFIX}INIT`;
-export const CHANGE_COMPONENT = `${PREFIX}CHANGE_COMPONENT`;
+export const CHANGE_ELEMENT = `${PREFIX}CHANGE_ELEMENT`;
 export const init = createActionCreator(INIT);
-export const changeComponent = createActionCreator(CHANGE_COMPONENT);
+export const changeElement = createActionCreator(CHANGE_ELEMENT);
 
 export const UPDATE_PATH_INFO = `${PREFIX}UPDATE_PATH_INFO`;
 export const updatePathInfo = createActionCreator(UPDATE_PATH_INFO);
