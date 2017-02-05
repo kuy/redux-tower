@@ -39,10 +39,10 @@ class Tower extends PureComponent {
 
 // Routes
 const routes = {
-  '/': Index,
+  '/': <Index />,
   *'/tower'() {
     yield call(delay, 1000);
-    yield Tower;
+    yield <Tower/>;
   }
 };
 

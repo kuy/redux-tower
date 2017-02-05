@@ -30,7 +30,7 @@ test('unprefix', t => {
 });
 
 test('isTowerAction', t => {
-  t.true(actions.isTowerAction({ type: '@@redux-tower/CHANGE_COMPONENT' }));
+  t.true(actions.isTowerAction({ type: '@@redux-tower/CHANGE_ELEMENT' }));
   t.true(actions.isTowerAction({ type: '@@redux-tower/PUSH' }));
   t.false(actions.isTowerAction({ type: '@@redux-whatever/POP' }));
   t.false(actions.isTowerAction({ type: 'HOGE' }));
@@ -46,7 +46,7 @@ test('isHistoryAction', t => {
   t.true(actions.isHistoryAction({ type: '@@redux-tower/GO_BACK' }));
   t.true(actions.isHistoryAction({ type: '@@redux-tower/GO_FORWARD' }));
   t.false(actions.isHistoryAction({ type: '@@redux-tower/INIT' }));
-  t.false(actions.isHistoryAction({ type: '@@redux-tower/CHANGE_COMPONENT' }));
+  t.false(actions.isHistoryAction({ type: '@@redux-tower/CHANGE_ELEMENT' }));
   t.false(actions.isHistoryAction({ type: '@@redux-whatever/POP' }));
   t.false(actions.isHistoryAction({ type: 'HOGE' }));
   t.false(actions.isHistoryAction({ type: true }));

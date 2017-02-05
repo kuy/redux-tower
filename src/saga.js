@@ -1,11 +1,12 @@
+import React from 'react';
 import assert from 'assert';
 import { eventChannel, buffers } from 'redux-saga';
 import { call, fork, put, select, take, race } from 'redux-saga/effects';
 import transform from 'domain-specific-saga';
 import ruta3 from 'ruta3';
 import {
-  intercepted, unprefix, init, updatePathInfo, push, replace, changeComponent,
-  PUSH, REPLACE, CHANGE_COMPONENT, HISTORY_ACTIONS
+  intercepted, unprefix, init, updatePathInfo, push, replace, changeElement,
+  PUSH, REPLACE, CHANGE_ELEMENT, HISTORY_ACTIONS
 } from './actions';
 import {
   parseQueryString, normOffset, removeOffset, toCamelCase,
@@ -41,7 +42,7 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
   // Setup Domain Specific Saga
   const rules = [
     value => typeof value === 'string' ? put(replace(value)) : value,
-    value => isReactComponent(value) ? put(changeComponent(value)) : value,
+    value => React.isValidElement(value) ? put(changeElement(value)) : value,
   ];
   iterator = transform(iterator, rules);
 
@@ -60,8 +61,8 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
       };
     }
 
-    if (isPut(effect, CHANGE_COMPONENT)) {
-      // Run leaving hooks before changing component
+    if (isPut(effect, CHANGE_ELEMENT)) {
+      // Run leaving hooks before changing element
       console.log('run leaving hooks', hooks);
       for (const hook of hooks) {
         // TODO: check returned hooks and location

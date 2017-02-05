@@ -1,5 +1,5 @@
 import qs from 'querystring';
-import { PUSH, REPLACE, CHANGE_COMPONENT } from './actions';
+import { PUSH, REPLACE, CHANGE_ELEMENT } from './actions';
 
 export function normOffset(offset) {
   if (typeof offset === 'undefined') return;
@@ -54,5 +54,5 @@ export function isPut(effect, type) {
 }
 
 export function isPrevent(e) {
-  return isPut(e, CHANGE_COMPONENT) || isPut(e, PUSH) || isPut(e, REPLACE);
+  return isPut(e, CHANGE_ELEMENT) || isPut(e, PUSH) || isPut(e, REPLACE);
 }
