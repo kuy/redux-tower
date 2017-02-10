@@ -42,7 +42,12 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
   // Setup Domain Specific Saga
   const rules = [
     value => typeof value === 'string' ? put(replace(value)) : value,
-    value => React.isValidElement(value) ? put(changeElement(value)) : value,
+    (value) => {
+      if (isReactComponent(value)) {
+        throw new Error('Use React Element instead of React Component')
+      }
+      return React.isValidElement(value) ? put(changeElement(value)) : value
+    }
   ];
   iterator = transform(iterator, rules);
 
@@ -179,6 +184,10 @@ export function* theControlTower({ history, matcher, offset }) {
     }
 
     console.log('actions', entering, action, leaving);
+
+    if (isReactComponent(action)) {
+      throw new Error('Use React Element instead of React Component')
+    }
 
     // Clear for detecting location change while running action
     location = undefined;
