@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { put, select, call } from 'redux-saga/effects';
 import { createMemoryHistory } from 'history';
 import * as saga from '../saga';
-import * as actions from '../actions';
 import { CANCEL, ERROR, INITIAL } from '../preprocess';
 
 function isChannel(obj) {
@@ -51,7 +50,7 @@ test('theControlTower - basic', t => {
     channel: null,
     action: {
       type: '@@redux-tower/UPDATE_PATH_INFO',
-      payload: { path: "/hoge", params: {}, query: {}, splats: [], route: "/hoge" }
+      payload: { path: '/hoge', params: {}, query: {}, splats: [], route: '/hoge' }
     },
   });
 
@@ -532,9 +531,9 @@ test('theControlTower - no error page', t => {
 test('theControlTower - emit an error when using Component', t => {
   const routes = {
     *'/function'(){
-      yield Index
+      yield Index;
     }
-  }
+  };
   const { tower } = createTower(routes);
   const sagas = [tower];
 
@@ -549,7 +548,7 @@ test('theControlTower - emit an error when using Component', t => {
 test('theControlTower - emit an error when using Component directly', t => {
   const routes = {
     '/direct': Index
-  }
+  };
   const { tower } = createTower(routes);
   const sagas = [tower];
 

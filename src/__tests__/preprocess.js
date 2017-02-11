@@ -251,7 +251,7 @@ test('interpolate - basic', t => {
   let error = t.throws(() => {
     interpolate(routes);
   });
-  t.is(error.message, "You can only use one hook each enter/leave in '/a': length=4");
+  t.is(error.message, `You can only use one hook each enter/leave in '${'/a'}': length=4`);
 
   routes = {
     '/a': [enter, action, leave],
@@ -259,7 +259,7 @@ test('interpolate - basic', t => {
   error = t.throws(() => {
     interpolate(routes);
   });
-  t.is(error.message, "Hooks can be specified with nested routes in '/a'");
+  t.is(error.message, `Hooks can be specified with nested routes in '${'/a'}'`);
 
   routes = {
     '/a': [enter, enter, {
@@ -269,7 +269,7 @@ test('interpolate - basic', t => {
   error = t.throws(() => {
     interpolate(routes);
   });
-  t.is(error.message, "Hooks can be specified with nested routes in '/a'");
+  t.is(error.message, `Hooks can be specified with nested routes in '${'/a'}'`);
 });
 
 test('interpolate - more nested', t => {
@@ -360,7 +360,7 @@ test('resolve', t => {
   let error = t.throws(() => {
     resolve(routes);
   });
-  t.is(error.message, "Potential for circular reference in '/xxx'");
+  t.is(error.message, `Potential for circular reference in '${'/xxx'}'`);
 
   routes = {
     '/': [[], '/a', []],
@@ -369,7 +369,7 @@ test('resolve', t => {
   error = t.throws(() => {
     resolve(routes);
   });
-  t.is(error.message, "Potential for circular reference in '/'");
+  t.is(error.message, `Potential for circular reference in '${'/'}'`);
 
   routes = {
     '/': [[], '/a', []],
@@ -379,5 +379,5 @@ test('resolve', t => {
   error = t.throws(() => {
     resolve(routes);
   });
-  t.is(error.message, "Potential for circular reference in '/'");
+  t.is(error.message, `Potential for circular reference in '${'/'}'`);
 });

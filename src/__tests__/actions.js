@@ -21,12 +21,12 @@ test('unprefix', t => {
   let error = t.throws(() =>
     actions.unprefix(100)
   );
-  t.is(error.message, "Only accept string, but passed 'number'");
+  t.is(error.message, `Only accept string, but passed '${'number'}'`);
 
   error = t.throws(() =>
     actions.unprefix()
   );
-  t.is(error.message, "Only accept string, but passed 'undefined'");
+  t.is(error.message, `Only accept string, but passed '${'undefined'}'`);
 });
 
 test('isTowerAction', t => {
