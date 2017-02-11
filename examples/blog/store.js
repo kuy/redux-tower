@@ -23,4 +23,4 @@ export default function configureStore(initialState: State): Store<State, Action
   );
   sagaMiddleware.run(rootSaga);
   return store;
-};
+}

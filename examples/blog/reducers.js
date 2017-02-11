@@ -45,19 +45,19 @@ export const isDirty = (state: State) => state.posts.dirty;
 
 function app(state: AppState = initial.app, { type, payload }: Action): AppState {
   switch (type) {
-    case REQUEST_LOGIN:
-      return { ...state, login: undefined, status: 'working' };
-    case SUCCESS_LOGIN:
-      return { ...state, login: payload.username, status: 'ready', error: false };
-    case FAILURE_LOGIN:
-      return { ...state, login: undefined, status: 'ready', error: true };
+  case REQUEST_LOGIN:
+    return { ...state, login: undefined, status: 'working' };
+  case SUCCESS_LOGIN:
+    return { ...state, login: payload.username, status: 'ready', error: false };
+  case FAILURE_LOGIN:
+    return { ...state, login: undefined, status: 'ready', error: true };
 
-    case REQUEST_LOGOUT:
-      return { ...state, status: 'working' };
-    case SUCCESS_LOGOUT:
-      return { ...state, status: 'ready', error: false, login: undefined };
-    case FAILURE_LOGOUT:
-      return { ...state, status: 'ready', error: true };
+  case REQUEST_LOGOUT:
+    return { ...state, status: 'working' };
+  case SUCCESS_LOGOUT:
+    return { ...state, status: 'ready', error: false, login: undefined };
+  case FAILURE_LOGOUT:
+    return { ...state, status: 'ready', error: true };
   }
 
   return state;
@@ -65,26 +65,27 @@ function app(state: AppState = initial.app, { type, payload }: Action): AppState
 
 function posts(state: PostsState = initial.posts, { type, payload }: Action): PostsState {
   switch (type) {
-    case REQUEST_FETCH_POSTS:
-      return { ...state, status: 'working' };
-    case SUCCESS_FETCH_POSTS:
-      const { list, entities } = payload;
-      return {
-        ...state,
-        status: 'ready',
-        error: false,
-        list,
-        entities: {
-          ...state.entities,
-          ...entities,
-        },
-      };
-    case FAILURE_FETCH_POSTS:
-      return { ...state, status: 'ready', error: true };
-    case CANCEL_FETCH_POSTS:
-      return { ...state, status: 'ready', error: false };
-    case UPDATE_DIRTY:
-      return { ...state, dirty: payload };
+  case REQUEST_FETCH_POSTS:
+    return { ...state, status: 'working' };
+  case SUCCESS_FETCH_POSTS: {
+    const { list, entities } = payload;
+    return {
+      ...state,
+      status: 'ready',
+      error: false,
+      list,
+      entities: {
+        ...state.entities,
+        ...entities,
+      },
+    };
+  }
+  case FAILURE_FETCH_POSTS:
+    return { ...state, status: 'ready', error: true };
+  case CANCEL_FETCH_POSTS:
+    return { ...state, status: 'ready', error: false };
+  case UPDATE_DIRTY:
+    return { ...state, dirty: payload };
   }
 
   return state;

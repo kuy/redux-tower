@@ -15,7 +15,6 @@ import { isLoggedIn, isDirty } from '../reducers';
 
 import PostsIndex from '../pages/posts/index';
 import PostsShow from '../pages/posts/show';
-import About from '../pages/about';
 import UsersLogin from '../pages/users/login';
 import AdminPostsIndex from '../pages/admin/posts/index';
 import AdminPostsNew from '../pages/admin/posts/new';

@@ -16,7 +16,7 @@ class AdminPostsIndex extends Component {
     return <Container>
       <div>
         <Header floated='left' as='h1'>Posts</Header>
-        <Button floated='right' primary as={Link} to={`/admin/posts/new`}>New Post</Button>
+        <Button floated='right' primary as={Link} to={'/admin/posts/new'}>New Post</Button>
       </div>
       <List style={{ clear: 'both' }}>
         {posts.map(post =>
@@ -24,7 +24,7 @@ class AdminPostsIndex extends Component {
             <List.Content floated='right'>
               <Button.Group size='mini' compact>
                 <Link className='ui button' to={`/admin/posts/${post.id}/edit`}>Edit</Link>
-                <Button onClick={e => this.handleDelete(post.id)}>Delete</Button>
+                <Button onClick={ e => this.handleDelete(post.id)}>Delete</Button>
               </Button.Group>
             </List.Content>
             <List.Content>

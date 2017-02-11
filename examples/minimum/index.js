@@ -5,8 +5,8 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import logger from 'redux-logger';
 import createSagaMiddleware, { delay } from 'redux-saga';
-import { call, fork, put } from 'redux-saga/effects';
-import { saga as routerSaga, reducer as routerReducer, actions, createHashHistory } from '../../src/index';
+import { call, fork } from 'redux-saga/effects';
+import { saga as routerSaga, reducer as routerReducer, createHashHistory } from '../../src/index';
 import { Router } from '../../src/react/index';
 
 // Pages

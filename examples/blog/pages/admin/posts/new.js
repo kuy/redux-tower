@@ -8,7 +8,7 @@ import Form from './form';
 class AdminPostsNew extends Component {
   handleSubmit(post) {
     this.props.dispatch(requestCreatePost(post));
-    this.props.dispatch(actions.push(`/admin/posts/create`));
+    this.props.dispatch(actions.push('/admin/posts/create'));
   }
 
   render() {
