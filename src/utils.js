@@ -5,7 +5,7 @@ import { PUSH, REPLACE, CHANGE_ELEMENT } from './actions';
 export function normOffset(offset) {
   if (typeof offset === 'undefined') return;
   if (offset.indexOf('/') !== 0) {
-    offset = '/' + offset
+    offset = '/' + offset;
   }
   if (offset.lastIndexOf('/') === offset.length - 1) {
     offset = offset.slice(0, offset.length - 1);

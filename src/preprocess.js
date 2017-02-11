@@ -1,7 +1,6 @@
-import React from 'react'
+import React from 'react';
 import { put } from 'redux-saga/effects';
 import { replace, changeElement, isPrefixed, PREFIX } from './actions';
-import { isReactComponent } from './utils';
 
 export const ROUTES = `${PREFIX}ROUTES`;
 export const CANCEL = `${PREFIX}CANCEL`;
@@ -68,26 +67,26 @@ export function interpolate(routes, entering = [], leaving = []) {
 
       let enter, action, leave;
       switch (rval.length) {
-        case 1:
-          [action] = rval;
-          break;
-        case 2:
-          if (typeof rval[0] !== 'object' && typeof rval[1] !== 'object') {
-            // Special pattern: route action with leave hook
-            r[segment] = [entering, rval[0], [rval[1], ...leaving]];
-            continue;
-          }
-          if (typeof rval[0] === 'object') {
-            [action, leave] = rval;
-          } else {
-            [enter, action] = rval;
-          }
-          break;
-        case 3:
-          [enter, action, leave] = rval;
-          break;
-        default:
-          throw new Error(`You can only use one hook each enter/leave in '${segment}': length=${rval.length}`);
+      case 1:
+        [action] = rval;
+        break;
+      case 2:
+        if (typeof rval[0] !== 'object' && typeof rval[1] !== 'object') {
+          // Special pattern: route action with leave hook
+          r[segment] = [entering, rval[0], [rval[1], ...leaving]];
+          continue;
+        }
+        if (typeof rval[0] === 'object') {
+          [action, leave] = rval;
+        } else {
+          [enter, action] = rval;
+        }
+        break;
+      case 3:
+        [enter, action, leave] = rval;
+        break;
+      default:
+        throw new Error(`You can only use one hook each enter/leave in '${segment}': length=${rval.length}`);
       }
 
       if (typeof action !== 'object') {

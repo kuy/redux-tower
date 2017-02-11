@@ -1,15 +1,14 @@
 import React from 'react';
-import assert from 'assert';
 import { eventChannel, buffers } from 'redux-saga';
 import { call, fork, put, select, take, race } from 'redux-saga/effects';
 import transform from 'domain-specific-saga';
 import ruta3 from 'ruta3';
 import {
-  intercepted, unprefix, init, updatePathInfo, push, replace, changeElement,
+  unprefix, init, updatePathInfo, push, replace, changeElement,
   PUSH, REPLACE, CHANGE_ELEMENT, HISTORY_ACTIONS
 } from './actions';
 import {
-  parseQueryString, normOffset, removeOffset, toCamelCase,
+  parseQueryString, removeOffset, toCamelCase,
   isReactComponent, isBlock, isPut, isPrevent
 } from './utils';
 import preprocess, { ROUTES, getConfigurationActions } from './preprocess';
@@ -44,9 +43,9 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
     value => typeof value === 'string' ? put(replace(value)) : value,
     (value) => {
       if (isReactComponent(value)) {
-        throw new Error('Use React Element instead of React Component')
+        throw new Error('Use React Element instead of React Component');
       }
-      return React.isValidElement(value) ? put(changeElement(value)) : value
+      return React.isValidElement(value) ? put(changeElement(value)) : value;
     }
   ];
   iterator = transform(iterator, rules);
@@ -186,7 +185,7 @@ export function* theControlTower({ history, matcher, offset }) {
     console.log('actions', entering, action, leaving);
 
     if (isReactComponent(action)) {
-      throw new Error('Use React Element instead of React Component')
+      throw new Error('Use React Element instead of React Component');
     }
 
     // Clear for detecting location change while running action

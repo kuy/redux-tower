@@ -15,13 +15,13 @@ export const getOffset = state => state.router.offset;
 
 export default function routerReducer(state = initial, { type, payload }) {
   switch (type) {
-    case INIT:
-      return { ...state, ...payload };
-    case CHANGE_ELEMENT:
-      return { ...state, element: payload };
-    case UPDATE_PATH_INFO:
-      return { ...state, ...payload };
-    default:
-      return state;
+  case INIT:
+    return { ...state, ...payload };
+  case CHANGE_ELEMENT:
+    return { ...state, element: payload };
+  case UPDATE_PATH_INFO:
+    return { ...state, ...payload };
+  default:
+    return state;
   }
 }
