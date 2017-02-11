@@ -40,7 +40,7 @@ class Layout extends Component {
             <Menu.Menu position='right'>
               {auth}
               <Menu.Item><Link to='/admin/posts'>Admin</Link></Menu.Item>
-              <Menu.Item><Link external target='_blank' to='https://github.com/kuy/redux-tower'>GitHub</Link></Menu.Item>
+              <Menu.Item><Link external to='https://github.com/kuy/redux-tower'>GitHub</Link></Menu.Item>
               <Menu.Item>
                 <Input onChange={this.handleChange.bind(this)} icon='search' placeholder='Search...' />
               </Menu.Item>
