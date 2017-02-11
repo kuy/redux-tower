@@ -7,7 +7,7 @@ function getHref(props, withOffset = false) {
   let { href } = props;
 
   if (!to && !href) {
-    throw new Error(`<Link> component requires either 'to' or 'href' props.`);
+    throw new Error('<Link> component requires either "to" or "href" props.');
   }
 
   if (to && !href) {

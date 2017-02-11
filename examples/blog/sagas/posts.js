@@ -1,6 +1,6 @@
 // @flow
 
-import { put, call, fork } from 'redux-saga/effects';
+import { put, call } from 'redux-saga/effects';
 import { takeEvery } from 'redux-saga';
 import * as api from '../api';
 import {
@@ -11,7 +11,7 @@ import {
   REQUEST_CREATE_POST, REQUEST_STORE_POST, REQUEST_DELETE_POST
 } from '../actions';
 import type { IOEffect } from 'redux-saga/effects';
-import type { PostId, Post, QueryParams } from '../api';
+import type { PostId, QueryParams } from '../api';
 import type { Action } from '../actions';
 
 export function* loadPosts(params: QueryParams): Generator<IOEffect,void,*> {

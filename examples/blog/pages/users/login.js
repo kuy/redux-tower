@@ -13,7 +13,7 @@ class UsersLogin extends Component {
   handleSubmit(e, { formData }) {
     e.preventDefault();
     this.props.dispatch(requestLogin(formData));
-    this.props.dispatch(actions.push(`/users/login/processing`));
+    this.props.dispatch(actions.push('/users/login/processing'));
   }
 
   handleChange(name, value) {

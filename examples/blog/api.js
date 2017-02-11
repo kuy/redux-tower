@@ -50,7 +50,7 @@ const POSTS = {
     '5': {
       id: '5',
       title: 'About',
-      body: `<p>I'm <a href="https://twitter.com/kuy" target="_blank">@kuy</a>.</p>`,
+      body: `<p>I'm <a href=${'https://twitter.com/kuy'} target=${'_blank'}>@kuy</a>.</p>`,
     },
   },
 };

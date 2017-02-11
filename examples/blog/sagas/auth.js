@@ -23,7 +23,8 @@ function* handleLogin(): Generator<IOEffect,void,*> {
 
 function* handleLogout(): Generator<IOEffect,void,*> {
   while (true) {
-    const { payload } = yield take(REQUEST_LOGOUT);
+    // const { payload } = yield take(REQUEST_LOGOUT);
+    yield take(REQUEST_LOGOUT);
     const { data, error } = yield call(api.auth.logout);
     if (data && !error) {
       yield put(successLogout());

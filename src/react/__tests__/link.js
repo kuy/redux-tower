@@ -46,5 +46,5 @@ test('click + external', t => {
 
 test('either "to" or "href"', t => {
   const err = t.throws(() => shallow(<Link>Either</Link>));
-  t.is(err.message, "<Link> component requires either 'to' or 'href' props.");
+  t.is(err.message, '<Link> component requires either "to" or "href" props.');
 });
