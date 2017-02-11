@@ -528,3 +528,34 @@ test('theControlTower - no error page', t => {
   ret = sagas[0].next({ pathname: '/not/exists/page', search: '' });
   t.true(isChannel(ret.value.TAKE.channel));
 });
+
+test('theControlTower - emit an error when using Component', t => {
+  const routes = {
+    *'/function'(){
+      yield Index
+    }
+  }
+  const { tower } = createTower(routes);
+  const sagas = [tower];
+
+  sagas.push(moveTo(sagas[0], '/function'));
+  const errorFunction = t.throws(() => {
+    sagas[1].next();
+  });
+
+  t.is(errorFunction.message, 'Use React Element instead of React Component');
+});
+
+test('theControlTower - emit an error when using Component directly', t => {
+  const routes = {
+    '/direct': Index
+  }
+  const { tower } = createTower(routes);
+  const sagas = [tower];
+
+  const errorDirect = t.throws(() => {
+    sagas.push(moveTo(sagas[0], '/direct'));
+  });
+
+  t.is(errorDirect.message, 'Use React Element instead of React Component');
+});

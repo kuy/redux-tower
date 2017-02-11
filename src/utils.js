@@ -1,3 +1,4 @@
+import { Component } from 'react';
 import qs from 'querystring';
 import { PUSH, REPLACE, CHANGE_ELEMENT } from './actions';
 
@@ -40,7 +41,7 @@ export function toCamelCase(SNAKE_CASE) {
 }
 
 export function isReactComponent(func) {
-  return func.prototype && typeof func.prototype.isReactComponent !== 'undefined';
+  return func.prototype instanceof Component;
 }
 
 // https://redux-saga.github.io/redux-saga/docs/api/index.html#blocking--nonblocking
