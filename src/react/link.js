@@ -21,7 +21,7 @@ function getHref(props, withOffset = false) {
   return href;
 }
 
-class Link extends Component {
+export class Link extends Component {
   handleClick(e) {
     e.preventDefault();
 
@@ -39,7 +39,9 @@ class Link extends Component {
     const href = getHref(this.props, true);
 
     const props = { href, target, className };
-    if (!external) {
+    if (external) {
+      props.target = '_blank';
+    } else {
       props.onClick = this.handleClick.bind(this);
     }
 
