@@ -8,16 +8,28 @@ module.exports = {
     blog: './examples/blog/index.js'
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.js$/,
-      loader: 'babel-loader',
+      enforce: 'pre',
+      loader: 'eslint-loader',
+      exclude: /node_modules/
+    }, {
+      test: /\.js$/,
+      use: [
+        'babel-loader'
+      ],
       exclude: /node_modules/
     }, {
       test: /\.css$/,
-      loader: 'style-loader!css-loader'
+      use: [
+        'style-loader',
+        'css-loader'
+      ]
     }, {
       test: /\.(png|woff|woff2|eot|ttf|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-      loader: 'url-loader'
+      use: [
+        'url-loader'
+      ]
     }]
   },
   output: {
