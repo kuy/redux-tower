@@ -1,8 +1,22 @@
+// @flow
 import { Component } from 'react';
 import qs from 'querystring';
 import { PUSH, REPLACE, CHANGE_ELEMENT } from './actions';
+import type { Action } from './actions';
 
-export function normOffset(offset) {
+export interface MaybePutEffect {
+  PUT?: {
+    action: Action;
+  };
+}
+
+export interface BlockEffect {
+  [key: string]: {
+    action: Action;
+  };
+}
+
+export function normOffset(offset: string): ?string {
   if (typeof offset === 'undefined') return;
   if (offset.indexOf('/') !== 0) {
     offset = '/' + offset;
@@ -14,7 +28,7 @@ export function normOffset(offset) {
 }
 
 // offset: normalized offset
-export function removeOffset(pathname, offset) {
+export function removeOffset(pathname: string, offset: string): string {
   if (pathname.indexOf(offset + '/') === 0) {
     pathname = pathname.replace(offset, '');
   } else if (pathname === offset) {
@@ -23,37 +37,37 @@ export function removeOffset(pathname, offset) {
   return pathname;
 }
 
-export function parseQueryString(search) {
+export function parseQueryString(search: string): string {
   if (search.indexOf('?') === 0) {
     search = search.slice(1);
   }
   return qs.parse(search);
 }
 
-export function upperFirst(word) {
+export function upperFirst(word: string): string {
   if (typeof word !== 'string' || word.length === 0) return word;
   return word[0].toUpperCase() + word.slice(1).toLowerCase();
 }
 
-export function toCamelCase(SNAKE_CASE) {
+export function toCamelCase(SNAKE_CASE: string): string {
   const words = SNAKE_CASE.split('_');
   return [words[0].toLowerCase(), ...words.slice(1).map(upperFirst)].join('');
 }
 
-export function isReactComponent(func) {
+export function isReactComponent(func: Function): boolean {
   return func.prototype instanceof Component;
 }
 
 // https://redux-saga.github.io/redux-saga/docs/api/index.html#blocking--nonblocking
 const EFFECT_TYPES = ['TAKE', 'CALL', 'APPLY', 'CPS', 'JOIN', 'CANCEL', 'FLUSH', 'CANCELLED', 'RACE'];
-export function isBlock(effect) {
+export function isBlock(effect: BlockEffect): boolean {
   return EFFECT_TYPES.map(type => !!effect[type]).reduce((p, c) => p || c, false);
 }
 
-export function isPut(effect, type) {
+export function isPut(effect: MaybePutEffect, type: string): boolean {
   return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === type);
 }
 
-export function isPrevent(e) {
+export function isPrevent(e: MaybePutEffect): boolean {
   return isPut(e, CHANGE_ELEMENT) || isPut(e, PUSH) || isPut(e, REPLACE);
 }

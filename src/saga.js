@@ -18,11 +18,7 @@ import { getOffset } from './reducer';
 
 import type { Channel } from 'redux-saga';
 import type { IOEffect } from 'redux-saga/effects';
-
-export interface Action {
-  type: string;
-  payload: any;
-}
+import type { Action } from './actions';
 
 export type Routes = {
   [key: string]: any[] | string | Generator<*,void,*> | React.Element<*> | Routes;

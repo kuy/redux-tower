@@ -1,3 +1,9 @@
+// @flow
+export interface Action {
+  type: string;
+  payload: any;
+}
+
 export const PREFIX = '@@redux-tower/';
 
 export const INTERCEPTED = `${PREFIX}INTERCEPTED`;
