@@ -1,5 +1,22 @@
 import { INIT, CHANGE_ELEMENT, UPDATE_PATH_INFO } from './actions';
 
+import type { Element } from 'react';
+import type { Action } from './actions';
+
+export interface Initial {
+  element?: Element<*>;
+  path?: string;
+  params?: string;
+  query?: string;
+  splats?: string[];
+  route?: any;
+  offset?: string;
+}
+
+export interface GetOffset {
+  (state: Initial): string;
+}
+
 const initial = {
   element: undefined,
   path: undefined,
@@ -11,9 +28,9 @@ const initial = {
 };
 
 // FIXME: Assuming fixed reducer/state name 'router'
-export const getOffset = state => state.router.offset;
+export const getOffset: GetOffset = state => state.router.offset;
 
-export default function routerReducer(state = initial, { type, payload }) {
+export default function routerReducer(state: Initial = initial, { type, payload }: Action) {
   switch (type) {
   case INIT:
     return { ...state, ...payload };
