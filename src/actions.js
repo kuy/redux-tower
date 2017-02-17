@@ -4,22 +4,30 @@ export interface Action {
   payload: any;
 }
 
+export interface Intercepted {
+  type: string;
+  payload: any;
+  [key: string]: boolean;
+}
+export type ActionCreator = (type: string) => (payload: any) => Action;
+export type CreateActionCreatorArgs = (type: string) => (...args: any) => Action;
+
 export const PREFIX = '@@redux-tower/';
 
-export const INTERCEPTED = `${PREFIX}INTERCEPTED`;
-export const intercepted = action => ({ ...action, [INTERCEPTED]: true });
-export function unprefix(type) {
+export const INTERCEPTED  = `${PREFIX}INTERCEPTED`;
+export const intercepted = (action: Action): Action => ({ ...action, [INTERCEPTED]: true });
+export function unprefix(type: string): string {
   if (typeof type !== 'string') {
     throw new Error(`Only accept string, but passed '${typeof type}'`);
   }
   return type.replace(PREFIX, '');
 }
-export const isPrefixed = name => name.indexOf(PREFIX) === 0;
-export const isTowerAction = action => !!(action && action.type && isPrefixed(action.type));
-export const isHistoryAction = action => !!(action && action.type && HISTORY_ACTIONS.indexOf(action.type) !== -1);
-export const isIntercepted = action => !!(action && action[INTERCEPTED]);
+export const isPrefixed = (name: string): boolean => name.indexOf(PREFIX) === 0;
+export const isTowerAction = (action: Action): boolean => !!(action && action.type && isPrefixed(action.type));
+export const isHistoryAction = (action: Action): boolean => !!(action && action.type && HISTORY_ACTIONS.indexOf(action.type) !== -1);
+export const isIntercepted = (action: {[key: string]: Function}): boolean => !!(action && action[INTERCEPTED]);
 
-export const createActionCreator = type => payload => ({ type, payload });
+export const createActionCreator: ActionCreator = (type: string) => payload => ({ type, payload });
 
 export const INIT = `${PREFIX}INIT`;
 export const CHANGE_ELEMENT = `${PREFIX}CHANGE_ELEMENT`;
@@ -29,7 +37,7 @@ export const changeElement = createActionCreator(CHANGE_ELEMENT);
 export const UPDATE_PATH_INFO = `${PREFIX}UPDATE_PATH_INFO`;
 export const updatePathInfo = createActionCreator(UPDATE_PATH_INFO);
 
-export const createActionCreatorArgs = type => (...args) => ({ type, payload: args });
+export const createActionCreatorArgs: CreateActionCreatorArgs = type => (...args) => ({ type, payload: args });
 
 export const PUSH = `${PREFIX}PUSH`;
 export const REPLACE = `${PREFIX}REPLACE`;
