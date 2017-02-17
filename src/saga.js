@@ -1,3 +1,5 @@
+// @flow
+
 import React from 'react';
 import { eventChannel, buffers } from 'redux-saga';
 import { call, fork, put, select, take, race } from 'redux-saga/effects';
@@ -14,7 +16,55 @@ import {
 import preprocess, { ROUTES, getConfigurationActions } from './preprocess';
 import { getOffset } from './reducer';
 
-export function createMatcher(routes) {
+import type { Channel } from 'redux-saga';
+import type { IOEffect } from 'redux-saga/effects';
+
+export interface Action {
+  type: string;
+  payload: any;
+}
+
+export type Routes = {
+  [key: string]: any[] | string | Generator<*,void,*> | React.Element<*> | Routes;
+}
+
+export interface Location {
+  pathname: string;
+  search: string;
+}
+
+export type History = {
+  location: Location;
+  length: number;
+  action: string;
+  listen:((location: Location, action: string) => void) => any;
+}
+
+export interface SagaOptions {
+  history: History;
+  matcher: any;
+  offset: string;
+  routes: Routes;
+}
+
+export interface ControllTowerOptions {
+  history: History;
+  matcher: any;
+  offset: string;
+}
+
+export interface RouterArray {
+  prevented: boolean;
+  hooks: any;
+  location: ?Location;
+}
+
+export interface BlockReturn {
+  main: boolean;
+  loc: Location;
+}
+
+export function createMatcher(routes: Routes): any {
   routes = preprocess(routes);
   const matcher = ruta3();
   for (const path of Object.keys(routes)) {
@@ -25,7 +75,7 @@ export function createMatcher(routes) {
   return matcher;
 }
 
-function createLocationChannel(history) {
+function createLocationChannel(history: History): Channel {
   return eventChannel(emit => {
     // TODO: 'action' is not used but...
     const unlisten = history.listen((location, action) => {
@@ -37,7 +87,8 @@ function createLocationChannel(history) {
 
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
-export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asHook) {
+export function* runRouteAction(iterator: any, hooks: any, candidate: any,
+                                cancel: any, channel: any, asHook: boolean): Generator<IOEffect,RouterArray,RouterArray&BlockReturn> {
   // Setup Domain Specific Saga
   const rules = [
     value => typeof value === 'string' ? put(replace(value)) : value,
@@ -131,8 +182,7 @@ export function* runRouteAction(iterator, hooks, candidate, cancel, channel, asH
   }; 
 }
 
-// offset: normalized offset
-export function* theControlTower({ history, matcher, offset }) {
+export function* theControlTower({ history, matcher, offset }: ControllTowerOptions): Generator<IOEffect,void,Location&RouterArray> {
   const { cancel, error, initial } = getConfigurationActions(matcher);
   const channel = createLocationChannel(history);
 
@@ -147,7 +197,8 @@ export function* theControlTower({ history, matcher, offset }) {
   let hooks = [], location;
   while (true) {
     if (!location) {
-      location = yield take(channel);
+      // add empty string to prevent from flow error
+      location = yield take(channel, '');
     }
 
     let entering, action, leaving, args;
@@ -205,7 +256,7 @@ export function* theControlTower({ history, matcher, offset }) {
   }
 }
 
-function* handleLocationChange({ history, routes, offset }) {
+function* handleLocationChange({ history, routes, offset }: SagaOptions): Generator<IOEffect,void,void> {
   // Prepare initial state
   yield put(init({ offset }));
 
@@ -214,7 +265,7 @@ function* handleLocationChange({ history, routes, offset }) {
   yield fork(theControlTower, { history, matcher, offset });
 }
 
-function* handleHistoryAction({ history }) {
+function* handleHistoryAction({ history }: SagaOptions): Generator<IOEffect,void,Action&string> {
   while (true) {
     const { type, payload } = yield take(HISTORY_ACTIONS);
 
@@ -226,11 +277,12 @@ function* handleHistoryAction({ history }) {
       }
     }
 
-    history[toCamelCase(unprefix(type))](...payload);
+    const historyFunction = history[toCamelCase(unprefix(type))];
+    historyFunction(...payload);
   }
 }
 
-export default function* routerSaga(options) {
+export default function* routerSaga(options: SagaOptions): Generator<IOEffect,void,void> {
   if (typeof options.offset === 'undefined') {
     options.offset = '';
   }
