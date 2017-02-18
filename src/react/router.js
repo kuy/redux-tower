@@ -1,7 +1,20 @@
+// @flow
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import type { Routes } from '../saga';
+import type { Initial } from '../reducer';
+
+export interface RouterProps {
+  router: {
+    element: React.Element<*>;
+  };
+}
+
 class Router extends Component {
+  props: RouterProps
+
   render() {
     const { element: RouterElement } = this.props.router;
     if (RouterElement) {
@@ -13,7 +26,7 @@ class Router extends Component {
   }
 }
 
-function select({ router }) {
+function select({ router }: Initial): RouterProps {
   return { router };
 }
 
