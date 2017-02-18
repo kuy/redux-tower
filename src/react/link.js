@@ -1,8 +1,33 @@
+// @flow
+
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from '../actions';
 
-function getHref(props, withOffset = false) {
+import type { Dispatch } from 'redux';
+import type { Action } from '../actions';
+import type { Initial } from '../reducer';
+
+export interface LinkProps {
+  to: string;
+  href: string;
+  children: React.Element<*>;
+  dispatch: Dispatch<Action>;
+  external: boolean;
+  offset: string;
+  target: string;
+  className: string,
+  onClick?: Function;
+}
+
+export interface NextProps {
+  onClick?: Function;
+  href: string;
+  target: string;
+  className: string;
+}
+
+function getHref(props: LinkProps, withOffset: boolean = false): string {
   const { to, offset, external } = props;
   let { href } = props;
 
@@ -22,7 +47,13 @@ function getHref(props, withOffset = false) {
 }
 
 export class Link extends Component {
-  handleClick(e) {
+  props: LinkProps;
+  static defaultProps = {
+    external: false,
+    target: '_self',
+  }
+
+  handleClick(e: Event): void {
     e.preventDefault();
 
     const { onClick } = this.props;
@@ -38,7 +69,7 @@ export class Link extends Component {
     const { external, target, className, children } = this.props;
     const href = getHref(this.props, true);
 
-    const props = { href, target, className };
+    const props: NextProps = { href, target, className };
     if (external) {
       props.target = '_blank';
     } else {
@@ -49,21 +80,7 @@ export class Link extends Component {
   }
 }
 
-Link.propTypes = {
-  to: PropTypes.string,
-  href: PropTypes.string,
-  external: PropTypes.bool,
-  target: PropTypes.string,
-  className: PropTypes.string,
-  onClick: PropTypes.func,
-};
-
-Link.defaultProps = {
-  external: false,
-  target: '_self',
-};
-
-function select({ router: { offset } }) {
+function select({router: { offset }}: Initial): { offset: string} {
   return { offset };
 }
 
