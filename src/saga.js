@@ -21,7 +21,7 @@ import type { IOEffect } from 'redux-saga/effects';
 import type { Action } from './actions';
 
 export type Routes = {
-  [key: string]: any[] | string | Generator<*,void,*> | React.Element<*> | Routes;
+  [key: string | number]: any[] | string | Generator<*,void,*> | React.Element<*> | Routes;
 }
 
 export interface Location {

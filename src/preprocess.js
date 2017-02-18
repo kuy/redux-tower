@@ -1,13 +1,24 @@
+// @flow
+
 import React from 'react';
 import { put } from 'redux-saga/effects';
 import { replace, changeElement, isPrefixed, PREFIX } from './actions';
+
+import type { Routes } from './saga';
+import type { IOEffect } from 'redux-saga/effects';
 
 export const ROUTES = `${PREFIX}ROUTES`;
 export const CANCEL = `${PREFIX}CANCEL`;
 export const ERROR = `${PREFIX}ERROR`;
 export const INITIAL = `${PREFIX}INITIAL`;
 
-export const getConfigurationActions = matcher => {
+export interface ConfigurationActions {
+  cancel: Function;
+  error: Function;
+  initial: Function;
+}
+
+export const getConfigurationActions = (matcher: any): ConfigurationActions => {
   return {
     cancel: matcher[ROUTES][CANCEL],
     error: matcher[ROUTES][ERROR],
@@ -15,14 +26,14 @@ export const getConfigurationActions = matcher => {
   };
 };
 
-function createRouteAction(Element) {
-  return function* elementRouteAction() {
+function createRouteAction(Element: any) {
+  return function* elementRouteAction(): Generator<IOEffect,void,void> {
     yield put(changeElement(Element));
   };
 }
 
-function createLazyRedirectAction(path) {
-  return function* lazyRedirectAction() {
+function createLazyRedirectAction(path: string) {
+  return function* lazyRedirectAction():Generator<IOEffect,void,void> {
     yield put(replace(path));
   };
 }
@@ -31,7 +42,7 @@ const MAX_REDIRECTIONS = 10;
 
 // NOTE: Destructive operation
 // routes: already flatten
-export function resolve(routes) {
+export function resolve(routes: Routes): void {
   for (const path of Object.keys(routes)) {
     let count = 0, current = path;
     while (true) {
@@ -44,18 +55,20 @@ export function resolve(routes) {
         actions = [[], createLazyRedirectAction(current), []];
       }
 
-      const [enter, action, leave] = actions;
-      if (typeof action !== 'string') {
-        routes[path] = actions;
-        break;
-      }
+      if (Array.isArray(actions)) {
+        const [enter, action, leave] = actions;
+        if (typeof action !== 'string') {
+          routes[path] = actions;
+          break;
+        }
 
-      current = action;
+        current = action;
+      }
     }
   }
 }
 
-export function interpolate(routes, entering = [], leaving = []) {
+export function interpolate(routes: Routes, entering: any[] = [], leaving: any[] = []): Routes {
   const r = {};
   for (const segment of Object.keys(routes)) {
     let rval = routes[segment];
@@ -115,7 +128,7 @@ export function interpolate(routes, entering = [], leaving = []) {
 }
 
 // FIXME: Poor implementation :(
-export function resolveRelative(route, base) {
+export function resolveRelative(route: string, base: string[]): string {
   if (route.indexOf('/') === 0) {
     return route;
   }
@@ -142,7 +155,7 @@ export function resolveRelative(route, base) {
   return base.join('') + segments.map(s => '/' + s).join('');
 }
 
-function norm(path) {
+function norm(path: string): string {
   if (path.lastIndexOf('/') === path.length - 1) {
     path = path.slice(0, path.length - 1);
   }
@@ -154,7 +167,7 @@ function norm(path) {
 
 // TODO: Rewrite stack to recursive
 // routes: already interpolated
-export function flatten(routes) {
+export function flatten(routes: Routes): Routes {
   const r = {};
   const stack = [{
     current: routes,
@@ -199,15 +212,15 @@ export function flatten(routes) {
 }
 
 // NOTE: Destructive operation
-function amend(routes) {
+function amend(routes: Routes): void {
   for (const segment of Object.keys(routes)) {
-    if (isPrefixed(segment)) {
+    if (isPrefixed(segment) && Array.isArray(routes[segment])) {
       routes[segment] = routes[segment][1];
     }
   }
 }
 
-export default function preprocess(routes) {
+export default function preprocess(routes: Routes): Routes {
   // 1. Interpolate hooks in nested routes
   routes = interpolate(routes);
 
@@ -216,9 +229,11 @@ export default function preprocess(routes) {
 
   // 3. Replace React element with auto-generated route actions (sagas)
   for (const segment of Object.keys(routes)) {
-    const [enter, action, leave] = routes[segment];
-    if (React.isValidElement(action)) {
-      routes[segment] = [enter, createRouteAction(action), leave];
+    if (Array.isArray(routes[segment])) {
+      const [enter, action, leave] = routes[segment];
+      if (React.isValidElement(action)) {
+        routes[segment] = [enter, createRouteAction(action), leave];
+      }
     }
   }
 
