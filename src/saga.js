@@ -81,21 +81,24 @@ function createLocationChannel(history: History): Channel {
   }, buffers.expanding());
 }
 
+export type SpecificRule = [
+  (value: string | number) => any,
+  (value: Function) => any
+]
+
+// Setup Domain Specific Saga
+export const rules: SpecificRule = [
+  (value) => typeof value === 'string' ? put(replace(value)) : value,
+  (value) => {
+    if (isReactComponent(value)) {
+      throw new Error('Use React Element instead of React Component');
+    }
+    return React.isValidElement(value) ? put(changeElement(value)) : value;
+  }
+];
+
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
-export function* runRouteAction(iterator: any, hooks: any, candidate: any,
-                                cancel: any, channel: any, asHook: boolean): Generator<IOEffect,RouterArray,RouterArray&BlockReturn> {
-  // Setup Domain Specific Saga
-  const rules = [
-    value => typeof value === 'string' ? put(replace(value)) : value,
-    (value) => {
-      if (isReactComponent(value)) {
-        throw new Error('Use React Element instead of React Component');
-      }
-      return React.isValidElement(value) ? put(changeElement(value)) : value;
-    }
-  ];
-  iterator = transform(iterator, rules);
 
   let ret;
   while (true) {
