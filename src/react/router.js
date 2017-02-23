@@ -3,7 +3,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import type { Routes } from '../saga';
 import type { Initial } from '../reducer';
 
 export interface RouterProps {

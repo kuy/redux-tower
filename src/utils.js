@@ -4,17 +4,24 @@ import qs from 'querystring';
 import { PUSH, REPLACE, CHANGE_ELEMENT } from './actions';
 import type { Action } from './actions';
 
-export interface MaybePutEffect {
-  PUT?: {
-    action: Action;
+export type SagaEffect = {
+  [key: EffectKey]: any;
+  // TODO how to write appropriately
+  TAKE: any;
+  CALL: any;
+  APPLY: any;
+  CPS: any;
+  JOIN: any;
+  CANCEL: any;
+  FLUSH: any;
+  CANCELLED: any;
+  RACE: any;
+  PUT: {
+    action: Action
   };
 }
 
-export interface BlockEffect {
-  [key: string]: {
-    action: Action;
-  };
-}
+export type EffectKey = 'PUT' | 'TAKE' | 'CALL' | 'APPLY' | 'CPS'| 'JOIN'| 'CANCEL'| 'FLUSH'| 'CANCELLED'| 'RACE';
 
 export function normOffset(offset: string): ?string {
   if (typeof offset === 'undefined') return;
@@ -60,14 +67,14 @@ export function isReactComponent(func: Function): boolean {
 
 // https://redux-saga.github.io/redux-saga/docs/api/index.html#blocking--nonblocking
 const EFFECT_TYPES = ['TAKE', 'CALL', 'APPLY', 'CPS', 'JOIN', 'CANCEL', 'FLUSH', 'CANCELLED', 'RACE'];
-export function isBlock(effect: BlockEffect): boolean {
+export function isBlock(effect: SagaEffect): boolean {
   return EFFECT_TYPES.map(type => !!effect[type]).reduce((p, c) => p || c, false);
 }
 
-export function isPut(effect: MaybePutEffect, type: string): boolean {
+export function isPut(effect: SagaEffect, type: string): boolean {
   return !!(effect.PUT && effect.PUT.action && effect.PUT.action.type === type);
 }
 
-export function isPrevent(e: MaybePutEffect): boolean {
+export function isPrevent(e: SagaEffect): boolean {
   return isPut(e, CHANGE_ELEMENT) || isPut(e, PUSH) || isPut(e, REPLACE);
 }

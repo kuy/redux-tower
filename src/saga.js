@@ -17,8 +17,9 @@ import preprocess, { ROUTES, getConfigurationActions } from './preprocess';
 import { getOffset } from './reducer';
 
 import type { Channel } from 'redux-saga';
-import type { IOEffect } from 'redux-saga/effects';
+import type { IOEffect, RaceEffect} from 'redux-saga/effects';
 import type { Action } from './actions';
+import type { SagaEffect } from './utils';
 
 export type Routes = {
   [key: string | number]: any[] | string | Generator<*,void,*> | React.Element<*> | Routes;
@@ -49,15 +50,38 @@ export interface ControllTowerOptions {
   offset: string;
 }
 
+export interface RaceArg {
+  main: SagaEffect;
+  loc: any;
+}
+
+export type CastRace = (raceArg: RaceArg) => RaceEffect<RaceArg>;
+
+export type SpecificRule = [
+  (value: string | Function) => any,
+  (value: Function) => any
+]
+
 export interface RouterArray {
   prevented: boolean;
   hooks: any;
   location: ?Location;
 }
 
-export interface BlockReturn {
-  main: boolean;
+export type BlockReturn = {
+  main: any;
   loc: Location;
+}
+
+export type RouterActionGenerator = Generator<IOEffect|SagaEffect,RouterArray,RouterArray&BlockReturn>
+
+export type NextReturn = {
+  value: boolean|SagaEffect;
+  done: boolean;
+}
+
+export type Iterator = {
+  next: (ret: any) => NextReturn;
 }
 
 export function createMatcher(routes: Routes): any {
@@ -81,21 +105,23 @@ function createLocationChannel(history: History): Channel {
   }, buffers.expanding());
 }
 
+// Setup Domain Specific Saga
+export const rules: SpecificRule = [
+  (value) => typeof value === 'string' ? put(replace(value)) : value,
+  (value) => {
+    if (isReactComponent(value)) {
+      throw new Error('Use React Element instead of React Component');
+    }
+    return React.isValidElement(value) ? put(changeElement(value)) : value;
+  }
+];
+
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
-export function* runRouteAction(iterator: any, hooks: any, candidate: any,
-                                cancel: any, channel: any, asHook: boolean): Generator<IOEffect,RouterArray,RouterArray&BlockReturn> {
-  // Setup Domain Specific Saga
-  const rules = [
-    value => typeof value === 'string' ? put(replace(value)) : value,
-    (value) => {
-      if (isReactComponent(value)) {
-        throw new Error('Use React Element instead of React Component');
-      }
-      return React.isValidElement(value) ? put(changeElement(value)) : value;
-    }
-  ];
-  iterator = transform(iterator, rules);
+export function* runRouteAction(preIterator: Generator<*,*,*>, hooks: any, candidate: any,
+                                cancel: any, channel: any, asHook: boolean): RouterActionGenerator {
+  console.log('preIterator', preIterator);
+  const iterator: Iterator  = transform(preIterator, rules);
 
   let ret;
   while (true) {
@@ -110,6 +136,11 @@ export function* runRouteAction(iterator: any, hooks: any, candidate: any,
         hooks,               // Keep current leaving hooks
         location: undefined, // No location change
       };
+    }
+
+    if (typeof effect === 'boolean') {
+      // XXX: NOOP...?
+      continue;
     }
 
     if (isPut(effect, CHANGE_ELEMENT)) {
@@ -133,8 +164,12 @@ export function* runRouteAction(iterator: any, hooks: any, candidate: any,
       console.log('new leaving hooks', hooks);
     }
 
-    if (isBlock(effect)) {
-      const { main, loc } = yield race({
+    if (isBlock(effect) === true) {
+      // TODO redux-saga flow-typed race is need to be improved.
+      const castTemp: any  = race;
+      const castRace: CastRace = castTemp;
+
+      const { main, loc } = yield castRace({
         main: effect,
         loc: take(channel)
       });
@@ -175,7 +210,7 @@ export function* runRouteAction(iterator: any, hooks: any, candidate: any,
     prevented: false,    // Not prevented
     hooks,               // Keep or New
     location: undefined, // No location change
-  }; 
+  };
 }
 
 export function* theControlTower({ history, matcher, offset }: ControllTowerOptions): Generator<IOEffect,void,Location&RouterArray> {
