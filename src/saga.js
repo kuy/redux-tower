@@ -50,12 +50,10 @@ export interface ControllTowerOptions {
   offset: string;
 }
 
-export interface RaceArg {
+export type RaceArg = {
   main: SagaEffect;
   loc: any;
 }
-
-export type CastRace = (raceArg: RaceArg) => RaceEffect<RaceArg>;
 
 export type SpecificRule = [
   (value: string | Function) => any,
@@ -73,7 +71,7 @@ export type BlockReturn = {
   loc: Location;
 }
 
-export type RouterActionGenerator = Generator<IOEffect|SagaEffect,RouterArray,RouterArray&BlockReturn>
+export type RouterActionGenerator = Generator<IOEffect|SagaEffect,RouterArray,RouterArray|BlockReturn>
 
 export type NextReturn = {
   value: boolean|SagaEffect;
@@ -83,6 +81,8 @@ export type NextReturn = {
 export type Iterator = {
   next: (ret: any) => NextReturn;
 }
+
+export type CastRace = (raceArg: RaceArg) => RaceEffect<RaceArg>;
 
 export function createMatcher(routes: Routes): any {
   routes = preprocess(routes);
@@ -115,6 +115,18 @@ export const rules: SpecificRule = [
     return React.isValidElement(value) ? put(changeElement(value)) : value;
   }
 ];
+
+export function castRace(arg: any):CastRace{
+  return arg;
+}
+
+export function castRaceEffect(arg: any):RaceEffect<RaceArg>{
+  return arg;
+}
+
+export function castBlockReturn(arg: any):BlockReturn{
+  return arg;
+}
 
 // hooks: Stored current leaving hooks
 // candidate: Candidate of leaving hooks in current route
@@ -166,13 +178,12 @@ export function* runRouteAction(preIterator: Generator<*,*,*>, hooks: any, candi
 
     if (isBlock(effect) === true) {
       // TODO redux-saga flow-typed race is need to be improved.
-      const castTemp: any  = race;
-      const castRace: CastRace = castTemp;
-
-      const { main, loc } = yield castRace({
+      const castedRace:CastRace = castRace(race);
+      const raceEffect:RaceEffect<RaceArg> = castRaceEffect(yield castedRace({
         main: effect,
         loc: take(channel)
-      });
+      }));
+      const { main, loc }:BlockReturn = castBlockReturn(raceEffect);
 
       if (main) {
         ret = main;
@@ -213,7 +224,15 @@ export function* runRouteAction(preIterator: Generator<*,*,*>, hooks: any, candi
   };
 }
 
-export function* theControlTower({ history, matcher, offset }: ControllTowerOptions): Generator<IOEffect,void,Location&RouterArray> {
+export function castLocation(arg: any):Location{
+  return arg;
+}
+
+export function castRouterArray(arg: any):RouterArray{
+  return arg;
+}
+
+export function* theControlTower({ history, matcher, offset }: ControllTowerOptions): Generator<IOEffect,void,Location|RouterArray> {
   const { cancel, error, initial } = getConfigurationActions(matcher);
   const channel = createLocationChannel(history);
 
@@ -225,14 +244,13 @@ export function* theControlTower({ history, matcher, offset }: ControllTowerOpti
   // Initial location
   yield put(push(removeOffset(history.location.pathname, offset)));
 
-  let hooks = [], location;
+  let hooks = [], nextLocation:?Location;
   while (true) {
-    if (!location) {
-      // add empty string to prevent from flow error
-      location = yield take(channel, '');
-    }
-
     let entering, action, leaving, args;
+    let location:Location = (nextLocation)
+                             ? nextLocation
+                             : castLocation(yield take(channel, ''));
+    nextLocation = undefined;
 
     const pathname = removeOffset(location.pathname, offset);
     const matched = matcher.match(pathname);
@@ -255,7 +273,6 @@ export function* theControlTower({ history, matcher, offset }: ControllTowerOpti
       console.log('matched', '[no matched route]');
       if (!error) {
         console.error(`No matched route and error page: ${pathname} (original='${location.pathname}', offset='${offset}')`);
-        location = undefined; // Clear to prevent infinite loop
         continue;
       }
 
@@ -270,15 +287,12 @@ export function* theControlTower({ history, matcher, offset }: ControllTowerOpti
       throw new Error('Use React Element instead of React Component');
     }
 
-    // Clear for detecting location change while running action
-    location = undefined;
-
     for (const fn of [...entering, action]) {
       const [iterator, asHook] = fn === action ? [fn(args), false] : [fn(), true];
-      const ret = yield call(runRouteAction, iterator, hooks, leaving, cancel, channel, asHook);
+      const ret:RouterArray = castRouterArray(yield call(runRouteAction, iterator, hooks, leaving, cancel, channel, asHook));
       hooks = ret.hooks;
       if (ret.location) {
-        location = ret.location;
+        nextLocation = ret.location;
       }
       if (ret.prevented === true) {
         break; // GOTO: Outermost while-loop
@@ -296,14 +310,18 @@ function* handleLocationChange({ history, routes, offset }: SagaOptions): Genera
   yield fork(theControlTower, { history, matcher, offset });
 }
 
-function* handleHistoryAction({ history }: SagaOptions): Generator<IOEffect,void,Action&string> {
+function castAction(arg: any): Action {
+  return arg;
+}
+
+function* handleHistoryAction({ history }: SagaOptions): Generator<IOEffect,void,Action|string> {
   while (true) {
-    const { type, payload } = yield take(HISTORY_ACTIONS);
+    const { type, payload }:Action = castAction(yield take(HISTORY_ACTIONS));
 
     if (type === PUSH || type === REPLACE) {
       // Prepend offset to path at first argument in payload
       const offset = yield select(getOffset);
-      if (offset) {
+      if (offset && typeof offset === 'string') {
         payload[0] = offset + payload[0];
       }
     }
