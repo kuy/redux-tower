@@ -2,7 +2,7 @@
 
 var webpack = require('webpack');
 
-module.exports = {
+module.exports = Object.assign({
   entry: {
     minimum: './examples/minimum/index.js',
     blog: './examples/blog/index.js'
@@ -36,13 +36,18 @@ module.exports = {
     path: __dirname + '/build',
     filename: '[name].bundle.js',
     publicPath: '/in-memory'
-  },
-  plugins: (process.env.NODE_ENV === 'production') ? [
+  }
+},
+(process.env.NODE_ENV === 'production') ? {
+  plugins: [
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: JSON.stringify('production') }
     }),
     new webpack.optimize.UglifyJsPlugin({
       compress: { warnings: false }
     })
-  ] : []
-};
+  ]
+} : {
+  plugins: [],
+  devtool: 'inline-source-map'
+});
