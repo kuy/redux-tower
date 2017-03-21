@@ -71,7 +71,7 @@
     "rimraf": "^2.5.4",
     "semantic-ui-css": "^2.2.4",
     "semantic-ui-react": "^0.67.0",
-    "style-loader": "^0.14.0",
+    "style-loader": "^0.15.0",
     "testdouble": "^2.0.1",
     "url-loader": "^0.5.7",
     "webpack": "^2.2.1",
