@@ -57,7 +57,7 @@
     "eslint-loader": "^1.6.1",
     "eslint-plugin-flowtype": "^2.30.0",
     "eslint-plugin-react": "^6.9.0",
-    "file-loader": "^0.10.0",
+    "file-loader": "^0.11.0",
     "flow-bin": "^0.42.0",
     "nyc": "^10.1.2",
     "react": "^15.4.2",
