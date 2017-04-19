@@ -1,5 +1,4 @@
 .babelrc
-src
 build
 examples
 flow-typed
