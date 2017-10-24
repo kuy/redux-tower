@@ -37,7 +37,7 @@
     "ruta3": "^2.0.1"
   },
   "devDependencies": {
-    "ava": "^0.18.1",
+    "ava": "^0.23.0",
     "babel-cli": "^6.22.2",
     "babel-core": "^6.22.1",
     "babel-eslint": "^8.0.0",
