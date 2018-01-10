@@ -137,7 +137,8 @@ export function* theControlTower({ history, matcher, offset }) {
   }
 
   // Initial location
-  yield put(push(removeOffset(history.location.pathname, offset)));
+  const nextPath = `${history.location.pathname}${history.location.search}`;
+  yield put(push(removeOffset(nextPath, offset)));
 
   let hooks = [], location;
   while (true) {
