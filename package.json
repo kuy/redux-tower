@@ -70,7 +70,7 @@
     "redux-saga": "^0.14.3",
     "rimraf": "^2.5.4",
     "semantic-ui-css": "^2.2.4",
-    "semantic-ui-react": "^0.75.0",
+    "semantic-ui-react": "^0.77.2",
     "style-loader": "^0.19.0",
     "testdouble": "^3.0.0",
     "url-loader": "^0.6.1",
