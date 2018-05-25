@@ -58,7 +58,7 @@
     "eslint-plugin-flowtype": "^2.30.0",
     "eslint-plugin-react": "^7.0.0",
     "file-loader": "^1.0.0-rc.0",
-    "flow-bin": "^0.57.1",
+    "flow-bin": "^0.73.0",
     "nyc": "^11.0.2",
     "react": "^15.4.2",
     "react-addons-test-utils": "^15.4.2",
