@@ -75,7 +75,7 @@
     "testdouble": "^3.0.0",
     "url-loader": "^0.6.1",
     "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.3.0"
+    "webpack-dev-server": "^3.3.1"
   },
   "ava": {
     "require": [
